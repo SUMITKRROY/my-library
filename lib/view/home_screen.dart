@@ -8,6 +8,7 @@ import 'package:mylibrary/route/route_generater.dart';
 import '../component/container.dart';
 import '../component/mybutton.dart';
 import 'login_screen.dart';
+import 'member.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -79,9 +80,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
-        elevation: 0,
-        backgroundColor: Color(0xff63A6DC),
         title:
             MyText(label: "My library", fontSize: 24, fontColor: Colors.white),
         actions: [
@@ -178,13 +176,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   itemCount: grid_Details['PREMIUM_BOUTIQUES'].length,
                   itemBuilder: (context, index) {
+                    String gridTitle = grid_Details['PREMIUM_BOUTIQUES'][index]
+                    ['heading'];
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.of(context).pushNamed(
+
+                          Navigator.pushNamed(
+                            context,
                             RoutePath.memberScreen,
-                            arguments: index,  // Replace 1 with the dynamic index value you want to pass
+                            arguments: MemberScreen(
+                              title:  gridTitle, message:  'This message is extracted in the build method.',
+                            ),
                           );
 
                         },
@@ -207,11 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           child: Center(
-                            child: Text(
-                              grid_Details['PREMIUM_BOUTIQUES'][index]
-                                  ['heading'],
-                              textAlign: TextAlign.center,
-                            ),
+                            child: MyText(label: gridTitle, fontSize: 16, fontColor: Colors.white,alignment: true,)
                           ),
                         ),
                       ),

@@ -36,7 +36,13 @@ class MyRoutes {
     /// Member Screen
       case RoutePath.memberScreen:
         return MaterialPageRoute(
-          builder: (_) => MemberScreen(),
+          builder: (context) {
+            final args = settings.arguments as MemberScreen;
+            return MemberScreen(
+              title: args.title,
+              message: args.message,
+            );
+          },
         );
     //
     // /// Notification Screen

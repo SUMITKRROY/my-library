@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 
 class MyText extends StatelessWidget {
   final String label;
-  final double fontSize;
-  final Color fontColor;
+   double? fontSize;
+   Color? fontColor;
     bool alignment;
 
   MyText({
     super.key,
     required this.label,
-    required this.fontSize,
-    required this.fontColor,
+      this.fontSize,
+      this.fontColor,
       this.alignment = false
   });
 
@@ -19,8 +19,8 @@ class MyText extends StatelessWidget {
     return Text(
       label,
       style: TextStyle(
-        fontSize: fontSize,
-        color: fontColor,
+        fontSize: fontSize ?? 14,
+        color: fontColor ?? Colors.white,
       ),
       textAlign: alignment ? TextAlign.center : TextAlign.start,
     );

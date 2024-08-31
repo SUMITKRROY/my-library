@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylibrary/route/pageroute.dart';
 import 'package:mylibrary/route/route_generater.dart';
+import 'package:mylibrary/utils/theme_changer.dart';
+import 'package:mylibrary/view/seat_Allotment.dart';
 
 
 void main() {
@@ -23,16 +25,12 @@ class MyApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       child: MaterialApp(
-        initialRoute: RoutePath.splash,
-        onGenerateRoute: MyRoutes.generateRoute,
+        // initialRoute: RoutePath.splash,
+        // onGenerateRoute: MyRoutes.generateRoute,
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
-        theme: ThemeData(
-
-          //  colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-       // home: LanguageSelectionPage(),
+        title: 'My Library',
+        theme: lightMode,
+       home: BookSeats(totalSeats: '11',),
       ),
     );
   }
