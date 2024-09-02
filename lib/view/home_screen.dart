@@ -84,7 +84,9 @@ class _HomeScreenState extends State<HomeScreen> {
             MyText(label: "My library", fontSize: 24, fontColor: Colors.white),
         actions: [
           IconButton(onPressed: () {}, icon: Icon(Icons.person_3_rounded)),
-          IconButton(onPressed: () {}, icon: Icon(Icons.chair_alt)),
+          IconButton(onPressed: () {
+            Navigator.pushNamed(context, RoutePath.bookSeats);
+          }, icon: Icon(Icons.chair_alt)),
         ],
       ),
       drawer: Drawer(

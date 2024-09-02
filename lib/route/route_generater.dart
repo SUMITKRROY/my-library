@@ -6,6 +6,7 @@ import 'package:mylibrary/view/member.dart';
 import 'package:mylibrary/view/verifyOtp.dart';
 
 import '../splash.dart';
+import '../view/seat_Allotment.dart';
 
 class MyRoutes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -44,12 +45,12 @@ class MyRoutes {
             );
           },
         );
-    //
-    // /// Notification Screen
-    //   case RoutePath.notification:
-    //     return MaterialPageRoute(
-    //       builder: (_) => NotificationScreen(),
-    //     );
+
+    /// Notification Screen
+      case RoutePath.bookSeats:
+        return MaterialPageRoute(
+          builder: (_) => BookSeats(totalSeats: '11',),
+        );
     //
     // /// AboutUs Screen
     //   case RoutePath.aboutUs:
