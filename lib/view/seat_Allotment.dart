@@ -4,7 +4,9 @@ import 'package:mylibrary/component/container.dart';
 import 'package:mylibrary/component/myText.dart';
 import 'package:mylibrary/component/myTextForm.dart';
 import 'package:mylibrary/component/mybutton.dart';
-
+import 'package:mylibrary/database/table/seat_allotment.dart';
+import 'package:mylibrary/utils/utils.dart';
+import '../database/table/user_profile.dart';
 import '../utils/image.dart';
 
 class BookSeats extends StatefulWidget {
@@ -20,14 +22,19 @@ class BookSeats extends StatefulWidget {
 }
 
 class _BookSeatsState extends State<BookSeats> {
-  late List<bool> _selectedItems;
+  late int _selectedChairIndex;
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _memberIdController = TextEditingController();
-  String _errorText = '';
+  int _selectedPeriodIndex = -1; // To keep track of the selected period index
+  Map<String, dynamic> appDetailSet = {};
+  int _totalMembers = 0; // To hold the total number of members
+  int _totalSeats = 0; // To hold the total number of Seats
 
   @override
   void initState() {
     super.initState();
-    _selectedItems = List<bool>.generate(11, (index) => false); // 11 items
+    _selectedChairIndex = -1; // No chair selected initially
+    _fetchTotalMembers();
   }
 
   @override
@@ -36,153 +43,217 @@ class _BookSeatsState extends State<BookSeats> {
     super.dispose();
   }
 
+  Future<void> _fetchTotalMembers() async {
+    try {
+      List<Map<String, dynamic>> data = await SeatAllotment().getUserData();
+      List<Map<String, dynamic>> profileData = await ProfileTable().getProfile();
+      print("profileData: $profileData");
+      setState(() {
+        _totalMembers = data.length; // Assuming each entry represents a member
+        _totalSeats = profileData.first['TOTAL_SEATS'];
+        print("_totalMembers: $_totalSeats");
+      });
+    } catch (e) {
+      print("Error fetching total members: $e");
+    }
+  }
+
+  Future<void> _refreshData() async {
+    // Call the method to fetch data and update the UI
+    await _fetchTotalMembers();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: MyText(
-          label: "My Library (${widget.totalSeats} seats)",
+          label: "My Library (${_totalSeats} seats)",
           fontSize: 14.sp,
           fontColor: Colors.white,
         ),
       ),
-      body: GradientContainer(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: RefreshIndicator(
+        onRefresh: _refreshData,
+        child: Form(
+          key: _formKey,
+          child: GradientContainer(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
                 children: [
-                  _buildSeatInfoColumn("All Seats", widget.totalSeats),
-                  _buildSeatInfoColumn("Allotted", "0"),
-                  _buildSeatInfoColumn("Un Allotted", widget.totalSeats),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white),
-                  ),
-                  child: Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      MyText(label: "Morning"),
-                      MyText(label: "Afternoon"),
-                      MyText(label: "Evening"),
-                      MyText(label: "Night"),
-                      MyText(label: "FullDay"),
+                      _buildSeatInfoColumn("All Seats", "${_totalSeats}"),
+                      _buildSeatInfoColumn("Allotted", "${_totalMembers}"),
+                      _buildSeatInfoColumn("Un Allotted", "${_totalSeats - _totalMembers}"),
                     ],
                   ),
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
                       padding: const EdgeInsets.all(8.0),
-                      child: TextFormField(
-                        controller: _memberIdController,
-                        decoration: InputDecoration(
-                          labelText: "Enter member id",
-                          labelStyle: TextStyle(color: Colors.white),
-                          filled: true,
-                          fillColor: Colors.transparent,
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          errorText: _errorText.isNotEmpty ? _errorText : null,
-                        ),
-                        style: TextStyle(color: Colors.white),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildPeriodButton(0, "Morning"),
+                          _buildPeriodButton(1, "Afternoon"),
+                          _buildPeriodButton(2, "Evening"),
+                          _buildPeriodButton(3, "Night"),
+                          _buildPeriodButton(4, "FullDay"),
+                        ],
                       ),
                     ),
                   ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            controller: _memberIdController,
+                            decoration: InputDecoration(
+                              labelText: "Enter member id",
+                              labelStyle: TextStyle(color: Colors.white),
+                              filled: true,
+                              fillColor: Colors.transparent,
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.white),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.white),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.red),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.red),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              disabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.white),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            validator: (String? value) {
+                              if (value == null || value.isEmpty) {
+                                return "Member id is required";
+                              }
+                              return null;
+                            },
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              setState(() async {
+                                await _handleSeatAllotment();
+                              });
+
+                            }
+                          },
+                          child: MyText(label: "Get Seat"),
+                        ),
+                      ),
+                    ],
+                  ),
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          _errorText = _memberIdController.text.isEmpty
-                              ? "Member ID cannot be empty"
-                              : '';
-                        });
-                        if (_errorText.isEmpty) {
-                          // Implement your button logic here
-                        }
+                    child: GridView.builder(
+                      physics: BouncingScrollPhysics(),
+                      padding: EdgeInsets.all(8.0),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        childAspectRatio: 1,
+                        crossAxisSpacing: 8.0,
+                        mainAxisSpacing: 8.0,
+                      ),
+                      itemCount: widget.totalSeats.isNotEmpty ? int.parse(widget.totalSeats) : 0,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedChairIndex = _selectedChairIndex == index ? -1 : index;
+                            });
+                          },
+                          child: Semantics(
+                            label: 'Seat ${index + 1}',
+                            child: Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: Image.asset(
+                                    ImagePath.chair,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 4,
+                                  left: 2,
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green,
+                                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                                    ),
+                                    child: MyText(
+                                      label: 'S-${index + 1}',
+                                      fontColor: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                if (_selectedChairIndex == index)
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: Icon(
+                                      Icons.check_circle,
+                                      color: Colors.green,
+                                      size: 24,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
                       },
-                      child: MyText(label: "Get Seat"),
                     ),
                   ),
                 ],
               ),
-              Expanded(
-                child: GridView.builder(
-                  padding: EdgeInsets.all(8.0),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    childAspectRatio: 1,
-                    crossAxisSpacing: 8.0,
-                    mainAxisSpacing: 8.0,
-                  ),
-                  itemCount: _selectedItems.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedItems[index] = !_selectedItems[index];
-                        });
-                      },
-                      child: Semantics(
-                        label: 'Seat ${index + 1}',
-                        child: Stack(
-                          children: [
-                            Positioned.fill(
-                              child: Image.asset(
-                                ImagePath.chair,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 4,
-                              left: 2,
-                              child: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: Colors.green,
-                                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                                ),
-                                child: MyText(
-                                  label: 'S-${index + 1}',
-                                  fontColor: Colors.white,
-                                ),
-                              ),
-                            ),
-                            if (_selectedItems[index])
-                              Positioned(
-                                top: 8,
-                                right: 8,
-                                child: Icon(
-                                  Icons.check_circle,
-                                  color: Colors.green,
-                                  size: 24,
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPeriodButton(int index, String label) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedPeriodIndex = _selectedPeriodIndex == index ? -1 : index;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.all(3.0),
+        decoration: BoxDecoration(
+          color: _selectedPeriodIndex == index ? Colors.green : Colors.transparent,
+          borderRadius: BorderRadius.all(Radius.circular(10.r)),
+        ),
+        child: MyText(
+          label: label,
+          fontColor: Colors.white,
         ),
       ),
     );
@@ -205,5 +276,48 @@ class _BookSeatsState extends State<BookSeats> {
         ),
       ],
     );
+  }
+
+  Future<void> _handleSeatAllotment() async {
+    if (_selectedPeriodIndex == -1 || _selectedChairIndex == -1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _selectedPeriodIndex == -1 ? 'Please select a shift' : 'Please select a chair',
+          ),
+        ),
+      );
+      return;
+    }
+
+    try {
+      String selectedShift = _getShiftLabel(_selectedPeriodIndex);
+
+      appDetailSet[SeatAllotment.totalSeats] = 55; // Only one seat is selected
+      appDetailSet[SeatAllotment.shift] = selectedShift;
+      appDetailSet[SeatAllotment.memberId] = _memberIdController.text.trim();
+      appDetailSet[SeatAllotment.chairNo] = "S-${_selectedChairIndex + 1}"; // Storing the selected chair index
+
+      await SeatAllotment().insert(appDetailSet);
+    } catch (e) {
+      print("error $e");
+    }
+  }
+
+  String _getShiftLabel(int index) {
+    switch (index) {
+      case 0:
+        return 'Morning';
+      case 1:
+        return 'Afternoon';
+      case 2:
+        return 'Evening';
+      case 3:
+        return 'Night';
+      case 4:
+        return 'FullDay';
+      default:
+        return '';
+    }
   }
 }

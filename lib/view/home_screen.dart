@@ -7,6 +7,8 @@ import 'package:mylibrary/route/route_generater.dart';
 
 import '../component/container.dart';
 import '../component/mybutton.dart';
+import '../database/table/seat_allotment.dart';
+import '../database/table/user_profile.dart';
 import 'login_screen.dart';
 import 'member.dart';
 
@@ -47,10 +49,13 @@ class _HomeScreenState extends State<HomeScreen> {
     ]
   };
 
+  Map<String, dynamic> appDetailSet = {};
+
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
+    appTableSet();
     _startTimer();
   }
 
@@ -59,6 +64,16 @@ class _HomeScreenState extends State<HomeScreen> {
     _pageController.dispose();
     _timer?.cancel();
     super.dispose();
+  }
+
+  void appTableSet() async{
+    try{
+      appDetailSet[ProfileTable.totalSeats] = 55; // Only one seat is selected
+      await ProfileTable().insert(appDetailSet);
+    }catch(e){
+      print("error $e");
+    }
+
   }
 
   void _startTimer() {
