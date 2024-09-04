@@ -85,20 +85,21 @@ class Utils {
   }
 
 
-  //validator
-  static Function employeeIdValidator() {
+  // Validator for User ID in the format "NAME04"
+  static Function userIdValidator() {
     return (String? value) {
-      RegExp regex = RegExp(r'^[A-Z]\d{7}$');
+      RegExp regex = RegExp(r'^[A-Z]{4}\d{2}$');
       if (value == null || value.isEmpty) {
-        return "Employee ID is required";
+        return "User ID is required";
       } else if (!value.startsWith(RegExp(r'[A-Z]'))) {
-        return "Employee ID must start with an alphabet";
+        return "User ID must start with an alphabet";
       } else if (!regex.hasMatch(value)) {
-        return "Put 7 digits (e.g., E0000000)";
+        return "User ID must be in the format NAME04 (e.g., ABCD01)";
       }
       return null;
     };
   }
+
 
   static Function passwordValidator() {
     return (String? value) {
@@ -139,7 +140,7 @@ class Utils {
       if (value == null || value.isEmpty) {
         return "Phone number is required";
       } else if (!regex.hasMatch(value)) {
-        return "Invalid phone number format";
+        return "phone number must be 10 digit";
       }
 
       return null;

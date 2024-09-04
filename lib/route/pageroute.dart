@@ -6,5 +6,6 @@ class RoutePath {
   static const String homeScreen = "/homeScreen";
   static const String memberScreen = "/memberScreen";
   static const String bookSeats = "/bookSeats";
+  static const String register = "/register";
 
 }

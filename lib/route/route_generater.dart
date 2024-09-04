@@ -6,6 +6,7 @@ import 'package:mylibrary/view/member.dart';
 import 'package:mylibrary/view/verifyOtp.dart';
 
 import '../splash.dart';
+import '../view/register_screen.dart';
 import '../view/seat_Allotment.dart';
 
 class MyRoutes {
@@ -52,11 +53,11 @@ class MyRoutes {
           builder: (_) => BookSeats(totalSeats: '11',),
         );
     //
-    // /// AboutUs Screen
-    //   case RoutePath.aboutUs:
-    //     return MaterialPageRoute(
-    //       builder: (_) => AboutUsScreen(),
-    //     );
+    /// AboutUs Screen
+      case RoutePath.register:
+        return MaterialPageRoute(
+          builder: (_) => RegisterScreen(),
+        );
     //
     // /// Terms Screen
     //   case RoutePath.termsAndConditions:

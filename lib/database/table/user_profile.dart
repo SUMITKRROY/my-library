@@ -6,17 +6,20 @@ class ProfileTable {
   static const String PROFILE_TABLE = "PROFILE_TABLE";
   static const String name = "Name";
   static const String phone = "Phone";
-  static const String profileImage = "ProfileImage";
-  static const String employeeId = "EmployeeId";
+  static const String email = "Email";
+  static const String password = "Password";
+  static const String userId = "UserId";
   static const String totalSeats = "TOTAL_SEATS";
+  static const String profileImage = "ProfileImage";
 
   static const String CREATE = '''
     CREATE TABLE IF NOT EXISTS $PROFILE_TABLE (
-      $employeeId TEXT PRIMARY KEY,
-      $phone TEXT DEFAULT '',
-      $profileImage TEXT DEFAULT '',
+      $userId TEXT PRIMARY KEY,
       $name TEXT DEFAULT '',
-      $totalSeats INTEGER DEFAULT 0
+      $phone TEXT DEFAULT '',
+
+      $totalSeats INTEGER DEFAULT 0,
+      $profileImage TEXT DEFAULT ''
     )
   ''';
 

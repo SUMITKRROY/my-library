@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mylibrary/component/myText.dart';
 import 'package:mylibrary/component/myTextForm.dart';
 import 'package:mylibrary/route/pageroute.dart';
 import 'package:mylibrary/utils/utils.dart';
@@ -76,17 +77,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         onChanged: (value) {
                           print('Text changed: $value');
                         },
-                 keyboardType: TextInputType.emailAddress,
+                        keyboardType: TextInputType.emailAddress,
                         controller: _name,
                         validator: false,
                         //validatorLabel: 'Email',
                         validatorFunc: Utils.emailValidator(),
                       ),
-                        SizedBox(
+                      SizedBox(
                         height: 20.sp,
                       ),
                       MyTextForm(
-                        keyboardType: TextInputType.text,textInputAction: TextInputAction.done,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.done,
                         label: 'Password',
                         onChanged: (value) {
                           print('Text changed: $value');
@@ -96,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         validatorFunc: Utils.passwordValidator(),
                         validatorLabel: 'Password',
                       ),
-                        SizedBox(
+                      SizedBox(
                         height: 20.sp,
                       ),
                       GestureDetector(
@@ -132,6 +134,25 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
+                      SizedBox(
+                        height: 20.sp,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10.h),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            GestureDetector(
+                        onTap: (){
+                          Navigator.pushReplacementNamed(context, RoutePath.register);
+                        },
+                              child: MyText(label: "Create",fontColor:  Color(0xff63A6DC), fontSize: 22.sp,),
+                            ),
+                            SizedBox(width: 04.w,),
+                            MyText(label: "New Account ?",fontColor:  Colors.black, fontSize: 18.sp,),
+                          ],
+                        ),
+                      )
                     ],
                   ),
                 ),

@@ -55,7 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _pageController = PageController();
-    appTableSet();
     _startTimer();
   }
 
@@ -66,15 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void appTableSet() async{
-    try{
-      appDetailSet[ProfileTable.totalSeats] = 55; // Only one seat is selected
-      await ProfileTable().insert(appDetailSet);
-    }catch(e){
-      print("error $e");
-    }
 
-  }
 
   void _startTimer() {
     _timer = Timer.periodic(Duration(seconds: 2), (Timer timer) {
