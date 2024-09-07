@@ -178,11 +178,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           GestureDetector(
                             onTap: () async {
                               if (_formKey.currentState!.validate()) {
-                                  appTableSet();
-                                Navigator.pushNamed(context, RoutePath.homeScreen);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Processing Data')),
-                                );
+                                   appTableSet(context);
+                                // Navigator.pushNamed(context, RoutePath.homeScreen);
+                                // ScaffoldMessenger.of(context).showSnackBar(
+                                //   const SnackBar(content: Text('Processing Data')),
+                                // );
                               }
                             },
                             child: Container(
@@ -234,19 +234,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ));
   }
 
-  void appTableSet() async{
-    try{
+  void appTableSet(BuildContext context) async {
+    try {
       appDetailSet[ProfileTable.userId] = _userId.text;
       appDetailSet[ProfileTable.name] = _name.text;
       appDetailSet[ProfileTable.phone] = _phone.text;
       appDetailSet[ProfileTable.email] = _email.text;
-      appDetailSet[ProfileTable.totalSeats] = _totalSeats.toString();
-      appDetailSet[ProfileTable.password] = _password;
+      appDetailSet[ProfileTable.totalSeats] = int.tryParse(_totalSeats.text) ?? 0; // Parse to integer
+      appDetailSet[ProfileTable.password] = _password.text; // Changed to .text
 
-      await ProfileTable().insert(appDetailSet);
-    }catch(e){
-      print("error $e");
+      // Call insert method with profile data and context for navigation
+      await ProfileTable().insert(appDetailSet, context);
+    } catch (e) {
+      print("Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
     }
-
   }
+
+
 }

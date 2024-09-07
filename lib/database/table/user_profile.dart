@@ -1,5 +1,8 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../../route/pageroute.dart';
 import '../database_helper.dart';
 
 class ProfileTable {
@@ -17,22 +20,39 @@ class ProfileTable {
       $userId TEXT PRIMARY KEY,
       $name TEXT DEFAULT '',
       $phone TEXT DEFAULT '',
-
       $totalSeats INTEGER DEFAULT 0,
+      $email TEXT DEFAULT '',
+      $password TEXT DEFAULT '',
       $profileImage TEXT DEFAULT ''
     )
   ''';
 
-  // Insert profile data into the database
-  Future<void> insert(Map<String, dynamic> profile) async {
-    DatabaseHelper databaseHelper = DatabaseHelper();
-    final db = await databaseHelper.database;
-    await db.insert(
-      PROFILE_TABLE,
-      profile,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+  Future<void> insert(Map<String, dynamic> profile, BuildContext context) async {
+    try {
+      DatabaseHelper databaseHelper = DatabaseHelper();
+      final db = await databaseHelper.database;
+      await db.insert(
+        PROFILE_TABLE,
+        profile,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      print("Data inserted successfully");
+
+      // Navigate to the next screen after successful insertion
+      Navigator.pushReplacementNamed(context, RoutePath.homeScreen);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Registration successful')),
+      );
+    } catch (e) {
+      print("Error inserting data: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error inserting data: $e')),
+      );
+    }
   }
+
+
 
   // // Retrieve profile data from the database
   // Future<Map<String, dynamic>?> getProfile() async {
