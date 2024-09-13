@@ -42,7 +42,7 @@ class MyRoutes {
             final args = settings.arguments as MemberScreen;
             return MemberScreen(
               title: args.title,
-              message: args.message,
+              index: args.index,
             );
           },
         );

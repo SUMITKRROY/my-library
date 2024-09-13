@@ -6,7 +6,7 @@ import 'package:mylibrary/component/myTextForm.dart';
 import 'package:mylibrary/route/pageroute.dart';
 import 'package:mylibrary/utils/utils.dart';
 
-import '../database/table/user_profile.dart';
+import '../database/table/user_profile_db.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -242,6 +242,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       appDetailSet[ProfileTable.email] = _email.text;
       appDetailSet[ProfileTable.totalSeats] = int.tryParse(_totalSeats.text) ?? 0; // Parse to integer
       appDetailSet[ProfileTable.password] = _password.text; // Changed to .text
+      appDetailSet[ProfileTable.loginStatus] = "true"; // Changed to .text
 
       // Call insert method with profile data and context for navigation
       await ProfileTable().insert(appDetailSet, context);

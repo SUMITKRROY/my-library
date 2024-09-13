@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylibrary/component/myText.dart';
 import 'package:mylibrary/route/pageroute.dart';
 import 'package:mylibrary/route/route_generater.dart';
-import 'package:mylibrary/view/login_screen.dart';
 import 'package:mylibrary/utils/image.dart';
+import '../database/table/user_profile_db.dart'; // Import your ProfileTable class
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -14,13 +14,34 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    Future.delayed(Duration(seconds: 03), () {
-     Navigator.pushReplacementNamed(context, RoutePath.login);
-      // Navigator.pushReplacement(
-      //     context, MaterialPageRoute(builder: (context) => WelcomeScreen()));
-    });
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    // Simulate a delay
+    await Future.delayed(Duration(seconds: 3));
+
+    try {
+      ProfileTable profileTable = ProfileTable();
+      List<Map<String, dynamic>> profiles = await profileTable.getProfile();
+
+      // Assuming there's only one user profile, or you want to check the first one
+      if (profiles.isNotEmpty) {
+        bool loginStatus = profiles[0][ProfileTable.loginStatus] == 'true';
+        print("cheaked ${loginStatus}");
+        if (loginStatus) {
+          Navigator.pushReplacementNamed(context, RoutePath.homeScreen);
+        } else {
+          Navigator.pushReplacementNamed(context, RoutePath.login);
+        }
+      } else {
+        Navigator.pushReplacementNamed(context, RoutePath.login);
+      }
+    } catch (e) {
+      print("Error checking login status: $e");
+      Navigator.pushReplacementNamed(context, RoutePath.login);
+    }
   }
 
   @override
@@ -45,15 +66,12 @@ class _SplashScreenState extends State<SplashScreen> {
                 ImagePath.logo,
                 height: 250.h,
                 width: 250.h,
-            //    color: Colors.white,
               ),
               SizedBox(
                 height: 10.h,
               ),
               Column(
                 children: [
-              //    MyText(label: "Library ", fontSize: 30.sp, fontColor: Colors.white),
-                  // MyText(lable: lable, fontsize: fontsize, fontcolor: fontcolor)
                   Text(
                     'Library',
                     style: TextStyle(
@@ -62,13 +80,6 @@ class _SplashScreenState extends State<SplashScreen> {
                       color: Colors.white,
                     ),
                   ),
-                  // MyText(label: "Focus on", fontSize: 20.sp, fontColor: Colors.white,alignment: true,),
-                  // MyText(
-                  //   label: "your goal",
-                  //   fontSize: 16.sp,
-                  //   fontColor: Colors.white,
-                  //   alignment: true,
-                  // )
                 ],
               ),
             ],

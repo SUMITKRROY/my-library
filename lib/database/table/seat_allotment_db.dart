@@ -4,16 +4,16 @@ import '../database_helper.dart';
 class SeatAllotment {
   static const String SEAT_ALLOTMENT = "SEAT_ALLOTMENT";
   static const String shift = "SHIFT";
-  static const String totalSeats = "TOTAL_SEATS";
   static const String memberId = "MEMBER_ID";
   static const String chairNo = "CHAIR_NO";
+  static const String memberStatus = "MemberStatus";
 
   static const String CREATE = '''
     CREATE TABLE IF NOT EXISTS $SEAT_ALLOTMENT (
     $memberId TEXT PRIMARY KEY,
-    $totalSeats INTEGER DEFAULT 0,
     $shift TEXT DEFAULT '',
-    $chairNo TEXT DEFAULT ''
+    $chairNo TEXT DEFAULT '',
+    $memberStatus TEXT DEFAULT ''
     )
   ''';
 
@@ -37,16 +37,38 @@ class SeatAllotment {
     return await db.query(SEAT_ALLOTMENT);
   }
 
-  //filter out data 15 day or 30 day
-
   // Method to delete a note from the database
   Future<int> deleteUserData() async {
     DatabaseHelper databaseHelper = DatabaseHelper();
     final db = await databaseHelper.database;
     return await db.delete(
       SEAT_ALLOTMENT,
-      //  where: '$id = ?',
-      // whereArgs: [noteId],
+    );
+  }
+
+  // Method to get active members
+  Future<List<Map<String, dynamic>>> getActiveMembers() async {
+    DatabaseHelper databaseHelper = DatabaseHelper();
+    final db = await databaseHelper.database;
+    return await db.query(
+      SEAT_ALLOTMENT,
+      where: '$memberStatus = ?',
+      whereArgs: ['Active'],
+    );
+  }
+
+
+
+
+  Future<void> updateMemberStatus(String memberId) async {
+    DatabaseHelper databaseHelper = DatabaseHelper();
+    final db = await databaseHelper.database;
+
+    await db.update(
+      SEAT_ALLOTMENT,
+      {memberStatus: 'inactive'},
+      where: '$memberId = ?',
+      whereArgs: [memberId],
     );
   }
 }

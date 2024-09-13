@@ -1,5 +1,5 @@
-import 'package:mylibrary/database/table/seat_allotment.dart';
-import 'package:mylibrary/database/table/user_profile.dart';
+import 'package:mylibrary/database/table/seat_allotment_db.dart';
+import 'package:mylibrary/database/table/user_profile_db.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
