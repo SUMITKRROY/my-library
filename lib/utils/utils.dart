@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 
 class Utils {
   //dialog
@@ -16,6 +17,11 @@ class Utils {
   //     ),
   //   );
   // }
+
+  static String getFormattedDate(DateTime date) {
+    final DateFormat formatter = DateFormat('dd/MM/yyyy'); // Customize the format
+    return formatter.format(date);
+  }
 
   static showDialogBox({
     required BuildContext context,

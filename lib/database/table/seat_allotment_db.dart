@@ -4,15 +4,21 @@ import '../database_helper.dart';
 class SeatAllotment {
   static const String SEAT_ALLOTMENT = "SEAT_ALLOTMENT";
   static const String shift = "SHIFT";
+  static const String name = "Name";
+  static const String amount = "Amount";
   static const String memberId = "MEMBER_ID";
   static const String chairNo = "CHAIR_NO";
+  static const String dateOfJoining = "Date_Of_Joining";
   static const String memberStatus = "MemberStatus";
 
   static const String CREATE = '''
     CREATE TABLE IF NOT EXISTS $SEAT_ALLOTMENT (
     $memberId TEXT PRIMARY KEY,
+    $name TEXT DEFAULT '',
     $shift TEXT DEFAULT '',
     $chairNo TEXT DEFAULT '',
+    $amount TEXT DEFAULT '',
+    $dateOfJoining TEXT DEFAULT '',
     $memberStatus TEXT DEFAULT ''
     )
   ''';
@@ -57,18 +63,35 @@ class SeatAllotment {
     );
   }
 
+  Future<List<Map<String, dynamic>>> getInactiveMembers() async {
+    DatabaseHelper databaseHelper = DatabaseHelper();
+    final db = await databaseHelper.database;
+    return await db.query(
+      SEAT_ALLOTMENT,
+      where: '$memberStatus = ?',
+      whereArgs: ['inactive'], // Fetch only members with 'inactive' status
+    );
+  }
 
 
-
-  Future<void> updateMemberStatus(String memberId) async {
+  Future<void> updateMemberStatus({required String memberId}) async {
     DatabaseHelper databaseHelper = DatabaseHelper();
     final db = await databaseHelper.database;
 
-    await db.update(
-      SEAT_ALLOTMENT,
-      {memberStatus: 'inactive'},
-      where: '$memberId = ?',
-      whereArgs: [memberId],
-    );
+    try {
+      // Update the member status to 'inactive'
+      await db.update(
+        SEAT_ALLOTMENT,
+        {'$memberStatus': 'inactive'}, // Set the column name correctly to 'MemberStatus'
+        where: 'MEMBER_ID = ?', // Update where MEMBER_ID matches
+        whereArgs: [memberId], // Bind the memberId argument
+      );
+      print("Successfully updated member ID: $memberId to status: inactive");
+    } catch (e) {
+      print("Error updating member status: $e");
+    }
   }
+
+
+
 }

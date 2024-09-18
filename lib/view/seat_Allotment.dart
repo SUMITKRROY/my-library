@@ -6,11 +6,11 @@ import 'package:mylibrary/component/myText.dart';
 import 'package:mylibrary/component/myTextForm.dart';
 import 'package:mylibrary/component/mybutton.dart';
 import 'package:mylibrary/database/table/seat_allotment_db.dart';
+import 'package:mylibrary/database/table/user_profile_db.dart';
 import 'package:mylibrary/provider/seat_allotment/getseat_bloc.dart';
 import 'package:mylibrary/route/pageroute.dart';
 import 'package:mylibrary/utils/utils.dart';
-import '../database/table/user_profile_db.dart';
-import '../utils/image.dart';
+import 'package:mylibrary/utils/image.dart';
 
 class BookSeats extends StatefulWidget {
   final String totalSeats;
@@ -28,6 +28,9 @@ class _BookSeatsState extends State<BookSeats> {
   late int _selectedChairIndex;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _memberIdController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _dateOfJoiningController = TextEditingController();
   int _selectedPeriodIndex = -1; // To keep track of the selected period index
   Map<String, dynamic> appDetailSet = {};
   int _totalMembers = 0; // To hold the total number of members
@@ -37,12 +40,16 @@ class _BookSeatsState extends State<BookSeats> {
   void initState() {
     super.initState();
     _selectedChairIndex = -1; // No chair selected initially
+    _dateOfJoiningController.text = Utils.getFormattedDate(DateTime.now()); // Set today's date
     _fetchTotalMembers();
   }
 
   @override
   void dispose() {
     _memberIdController.dispose();
+    _nameController.dispose();
+    _amountController.dispose();
+    _dateOfJoiningController.dispose();
     super.dispose();
   }
 
@@ -124,67 +131,39 @@ class _BookSeatsState extends State<BookSeats> {
                         ),
                       ),
                     ),
+                    _buildTextFormField(_memberIdController, "Enter member id"),
+                    _buildTextFormField(_nameController, "Enter name"),
+                    _buildTextFormField(_amountController, "Enter amount"),
+                    _buildTextFormField(_dateOfJoiningController, "Date of Joining", enabled: false),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Expanded(
-                          flex: 2,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TextFormField(
-                              controller: _memberIdController,
-                              decoration: InputDecoration(
-                                labelText: "Enter member id",
-                                labelStyle: TextStyle(color: Colors.white),
-                                filled: true,
-                                fillColor: Colors.transparent,
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                errorBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.red),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                focusedErrorBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.red),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                disabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                              ),
-                              validator: (String? value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Member id is required";
-                                }
-                                return null;
-                              },
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                        Expanded(
                           child: ElevatedButton(
                             onPressed: () async {
-                              if (_formKey.currentState!.validate()) {
+                              if (_selectedChairIndex == -1) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Please select a chair before proceeding.'),
+                                  ),
+                                );
+                              } else if (_formKey.currentState!.validate()) {
                                 context.read<GetSeatBloc>().add(
                                   InsertSeatEvent(
                                     selectedShift: _getShiftLabel(_selectedPeriodIndex),
                                     memberId: _memberIdController.text.trim(),
                                     chairNo: "S-${_selectedChairIndex + 1}",
                                     memberStatus: 'Active',
+                                    name: _nameController.text.trim(),
+                                    amount: _amountController.text.trim(),
+                                    dateOfJoining: _dateOfJoiningController.text.trim(),
                                   ),
                                 );
                               }
                             },
                             child: MyText(label: "Get Seat"),
                           ),
+
                         ),
                       ],
                     ),
@@ -254,6 +233,49 @@ class _BookSeatsState extends State<BookSeats> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextFormField(TextEditingController controller, String label, {bool enabled = true}) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextFormField(
+        controller: controller,
+        enabled: enabled,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(color: Colors.white),
+          filled: true,
+          fillColor: Colors.transparent,
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.white),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.white),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.red),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.red),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          disabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.white),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+        ),
+        validator: (String? value) {
+          if (value == null || value.isEmpty) {
+            return "$label is required";
+          }
+          return null;
+        },
+        style: TextStyle(color: Colors.white),
       ),
     );
   }

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mylibrary/component/container.dart';
 import 'package:mylibrary/component/myText.dart';
 import 'package:mylibrary/utils/theme_changer.dart';
 import '../database/table/seat_allotment_db.dart';
+import '../provider/member_details/member_details_bloc.dart';
+import '../provider/member_details/member_details_event.dart';
+import '../provider/member_details/member_details_state.dart';
 
 class MemberScreen extends StatefulWidget {
   final String title;
@@ -16,45 +20,22 @@ class MemberScreen extends StatefulWidget {
 }
 
 class _MemberScreenState extends State<MemberScreen> {
-  List<Map<String, dynamic>> _members = []; // List to store active members data
+  late MemberBloc _memberBloc;
 
   @override
   void initState() {
     super.initState();
-    _fetchMembers(); // Call function to fetch members based on index
+    _memberBloc = MemberBloc(SeatAllotment());
+
+    // Pass the index to the Bloc to fetch members
+    _memberBloc.add(FetchMembersEvent(widget.index));
   }
 
-  Future<void> _fetchMembers() async {
-    try {
-      SeatAllotment SEAT_ALLOTMENT = SeatAllotment();
-      //List<Map<String, dynamic>> allMembers = await SEAT_ALLOTMENT.getUserData();
-
-      if(widget.index==0){
-        List<Map<String, dynamic>> allMembers = await SEAT_ALLOTMENT.getActiveMembers();
-        setState(() {
-          _members = allMembers; // Update the members list
-        });
-      }else if(widget.index==1){
-        List<Map<String, dynamic>> allMembers = await SEAT_ALLOTMENT.getUserData();
-        setState(() {
-          _members = allMembers; // Update the members list
-        });
-      }else{
-        List<Map<String, dynamic>> allMembers = await SEAT_ALLOTMENT.getUserData();
-        setState(() {
-          _members = allMembers; // Update the members list
-        });
-      }
-
-
-
-      print("All member data: ${_members.length}");
-    } catch (e) {
-      print("Error fetching members: $e");
-    }
+  @override
+  void dispose() {
+    _memberBloc.close();
+    super.dispose();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -62,57 +43,65 @@ class _MemberScreenState extends State<MemberScreen> {
       appBar: AppBar(
         title: MyText(label: widget.title, fontSize: 18, fontColor: Colors.white),
       ),
-      body: GradientContainer(
-        child: _members.isEmpty
-            ? Center(child: MyText(label: 'No Active Members'))
-            : ListView.builder(
-          itemCount: _members.length,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                // Add any action you want to trigger on card tap
-                print("Tapped on member ${_members[index]['MEMBER_ID']}");
-              },
-              child: Card(
-                color: ColorsData.backToTopBackgroundColor,
-                elevation: 5,
-                margin: const EdgeInsets.symmetric(
-                    vertical: 10, horizontal: 15),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: ListTile(
-                    leading: MyText(label: 'ID: ${_members[index]['MEMBER_ID']}'),
-                    title: MyText(label: 'Shift: ${_members[index]['SHIFT']}', fontSize: 16.sp),
-                    subtitle: MyText(
-                      label: 'Chair No: ${_members[index]['CHAIR_NO']}',
-                      fontSize: 12.sp,
+      body: BlocBuilder<MemberBloc, MemberState>(
+        bloc: _memberBloc,
+        builder: (context, state) {
+          if (state is MemberLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is MemberSuccess) {
+            return GradientContainer(
+              child: state.members.isEmpty
+                  ? Center(child: MyText(label: 'No Active Members'))
+                  :ListView.builder(
+                itemCount: state.members.length,
+                itemBuilder: (context, index) {
+                  print("state : ${state}");
+                  // Determine the color based on member status
+                  Color cardColor = state.members[index]['MemberStatus'] == 'inactive'
+                      ? Colors.red
+                      : ColorsData.backToTopBackgroundColor;
+
+                  Color iconbutton = state.members[index]['MemberStatus'] == 'inactive'
+                      ? Colors.white
+                      : Colors.red;
+
+                  return GestureDetector(
+                    onTap: () {
+                      print("Tapped on member ${state.members[index]['MEMBER_ID']}");
+                    },
+                    child: Card(
+                      color: cardColor,
+                      elevation: 5,
+                      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: ListTile(
+                          leading: MyText(label: 'ID: ${state.members[index]['MEMBER_ID']}'),
+                          title: MyText(label: 'Shift: ${state.members[index]['SHIFT']}', fontSize: 16.sp),
+                          subtitle: MyText(label: 'Chair No: ${state.members[index]['CHAIR_NO']}', fontSize: 12.sp),
+                          trailing: IconButton(
+                            onPressed: () {
+                              _memberBloc.add(UpdateMemberStatusEvent(state.members[index]['MEMBER_ID']));
+                            },
+                            icon: Icon(Icons.delete),
+                            color:
+                            iconbutton
+                          ),
+                        ),
+                      ),
                     ),
-                    trailing: IconButton(
-                      onPressed: () {
-                        _deactivateMember(_members[index]['MEMBER_ID']);
-                      },
-                      icon: Icon(Icons.delete),
-                      color: Colors.red,
-                    ),
-                  ),
-                ),
-              ),
+                  );
+                },
+              )
+
             );
-          },
-        ),
+          } else if (state is MemberFailure) {
+            return Center(child: Text('Error: ${state.error}'));
+          }
+          return const Center(child: Text('No data available'));
+        },
       ),
     );
   }
-  Future<void> _deactivateMember(String memberId) async {
-    print("Attempting to update member ID: $memberId to status: inactive");
-    try {
-      SeatAllotment SEAT_ALLOTMENT = SeatAllotment();
-      await SEAT_ALLOTMENT.updateMemberStatus(memberId);
-      print("Successfully updated member ID: $memberId");
-      // Refresh the member list after updating
-      await _fetchMembers();
-    } catch (e) {
-      print("Error updating member status: $e");
-    }
-  }
 }
+

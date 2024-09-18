@@ -6,6 +6,7 @@ import 'package:mylibrary/view/member.dart';
 import 'package:mylibrary/view/verifyOtp.dart';
 
 import '../splash.dart';
+import '../view/admin.dart';
 import '../view/register_screen.dart';
 import '../view/seat_Allotment.dart';
 
@@ -57,6 +58,11 @@ class MyRoutes {
       case RoutePath.register:
         return MaterialPageRoute(
           builder: (_) => RegisterScreen(),
+        );
+
+        case RoutePath.pdfPage:
+        return MaterialPageRoute(
+          builder: (_) => PdfPage(),
         );
     //
     // /// Terms Screen

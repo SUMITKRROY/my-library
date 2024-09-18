@@ -121,6 +121,14 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
+              leading: Icon(Icons.picture_as_pdf, color: Colors.white),
+              title: Text('pdf screen', style: TextStyle(color: Colors.white)),
+              onTap: () {
+               Navigator.pushNamed(context, RoutePath.pdfPage);
+                // Navigate to home screen if not already there
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.settings, color: Colors.white),
               title: Text('Settings', style: TextStyle(color: Colors.white)),
               onTap: () {
