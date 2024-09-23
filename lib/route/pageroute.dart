@@ -8,5 +8,6 @@ class RoutePath {
   static const String bookSeats = "/bookSeats";
   static const String register = "/register";
   static const String pdfPage = "/PdfPage";
+  static const String profile = "/Profile";
 
 }

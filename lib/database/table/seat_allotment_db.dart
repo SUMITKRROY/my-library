@@ -92,6 +92,21 @@ class SeatAllotment {
     }
   }
 
+// Define a function that calculates the total collection from the 'Amount' field
+  Future<double> getTotalCollection() async {
+    DatabaseHelper databaseHelper = DatabaseHelper();
+    final db = await databaseHelper.database;
+
+    // Query the sum of the 'Amount' field from the database
+    var result = await db.rawQuery('SELECT SUM(CAST($amount AS REAL)) as total FROM $SEAT_ALLOTMENT');
+
+    // Extract the total value from the query result
+    if (result.isNotEmpty && result[0]['total'] != null) {
+      return result[0]['total'] as double;
+    } else {
+      return 0.0; // Return 0 if no values are present
+    }
+  }
 
 
 }

@@ -94,17 +94,16 @@ class Utils {
   // Validator for User ID in the format "NAME04"
   static Function userIdValidator() {
     return (String? value) {
-      RegExp regex = RegExp(r'^[A-Z]{4}\d{2}$');
+      RegExp regex = RegExp(r'^[A-Za-z]+\d{2}$');
       if (value == null || value.isEmpty) {
         return "User ID is required";
-      } else if (!value.startsWith(RegExp(r'[A-Z]'))) {
-        return "User ID must start with an alphabet";
       } else if (!regex.hasMatch(value)) {
-        return "User ID must be in the format NAME04 (e.g., ABCD01)";
+        return "User ID must be in the format Name45 (e.g., Sumit45)";
       }
       return null;
     };
   }
+
 
 
   static Function passwordValidator() {

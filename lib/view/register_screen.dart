@@ -87,7 +87,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             label: 'User Id',
                             controller: _userId,
                             inputFormatters: [
-                              LengthLimitingTextInputFormatter(06),
+                              LengthLimitingTextInputFormatter(08),
                             ],
                             keyboardType: TextInputType.text,
                             validator: true,

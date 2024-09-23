@@ -39,9 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
       {"icon": "", "heading": "Live Member", "count": "0"},
       {"icon": "", "heading": "Total Member", "count": "1"},
       {"icon": "", "heading": "Expired Member", "count": "3"},
-      {"icon": "", "heading": "Expired Member | 3-4 days", "count": "5"},
-      {"icon": "", "heading": "Expired Member | 4-7 days", "count": "5"},
-      {"icon": "", "heading": "Expired Member | 8-15 days", "count": "5"},
+      // {"icon": "", "heading": "Expired Member | 3-4 days", "count": "5"},
+      // {"icon": "", "heading": "Expired Member | 4-7 days", "count": "5"},
+      // {"icon": "", "heading": "Expired Member | 8-15 days", "count": "5"},
       {"icon": "", "heading": "Total Collection", "count": "5"},
       {"icon": "", "heading": "Total Exp", "count": "2"},
       {"icon": "", "heading": "Due Amount", "count": "4"}
@@ -83,7 +83,9 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: MyText(label: "My Library", fontSize: 24, fontColor: Colors.white),
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.person_3_rounded)),
+          IconButton(onPressed: () {
+            Navigator.pushNamed(context, RoutePath.profile);
+          }, icon: Icon(Icons.person_3_rounded)),
           IconButton(onPressed: () {
             Navigator.pushNamed(context, RoutePath.bookSeats);
           }, icon: Icon(Icons.chair_alt)),
