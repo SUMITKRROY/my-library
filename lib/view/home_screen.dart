@@ -22,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late PageController _pageController;
   int _currentPage = 0;
   Timer? _timer;
+  String userName = "User Name"; // Default name, will be updated from the database
 
   final Map<String, dynamic> product = {
     "library": {
@@ -39,9 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
       {"icon": "", "heading": "Live Member", "count": "0"},
       {"icon": "", "heading": "Total Member", "count": "1"},
       {"icon": "", "heading": "Expired Member", "count": "3"},
-      // {"icon": "", "heading": "Expired Member | 3-4 days", "count": "5"},
-      // {"icon": "", "heading": "Expired Member | 4-7 days", "count": "5"},
-      // {"icon": "", "heading": "Expired Member | 8-15 days", "count": "5"},
       {"icon": "", "heading": "Total Collection", "count": "5"},
       {"icon": "", "heading": "Total Exp", "count": "2"},
       {"icon": "", "heading": "Due Amount", "count": "4"}
@@ -53,6 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _pageController = PageController();
     _startTimer();
+    _fetchUserName(); // Fetch the user name when the screen initializes
   }
 
   @override
@@ -77,6 +76,14 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // Function to fetch user name from the database
+  Future<void> _fetchUserName() async {
+    ProfileTable profileTable = ProfileTable();
+    var profile = await profileTable.getLoggedInProfile();
+    setState(() {
+      userName = profile?['Name'] ?? "User Name"; // Update userName from the profile
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,11 +111,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   CircleAvatar(
                     radius: 40,
-                    backgroundImage: AssetImage('assets/profile_image.png'),
+                    backgroundImage: AssetImage("assets/images/Profile.gif"),
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'User Name',
+                    userName,
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                 ],
