@@ -11,6 +11,8 @@ class SeatAllotment {
   static const String dateOfJoining = "Date_Of_Joining";
   static const String memberStatus = "MemberStatus";
 
+  static const String totalCollection = "TotalCollection";
+
   static const String CREATE = '''
     CREATE TABLE IF NOT EXISTS $SEAT_ALLOTMENT (
     $memberId TEXT PRIMARY KEY,
@@ -98,7 +100,7 @@ class SeatAllotment {
     final db = await databaseHelper.database;
 
     // Query the sum of the 'Amount' field from the database
-    var result = await db.rawQuery('SELECT SUM(CAST($amount AS REAL)) as total FROM $SEAT_ALLOTMENT');
+    var result = await db.rawQuery('SELECT SUM(CAST($amount AS $totalCollection)) as total FROM $SEAT_ALLOTMENT');
 
     // Extract the total value from the query result
     if (result.isNotEmpty && result[0]['total'] != null) {
@@ -107,6 +109,28 @@ class SeatAllotment {
       return 0.0; // Return 0 if no values are present
     }
   }
+
+
+  Future<List<Map<String, dynamic>>> getFilteredSeatData() async {
+    try {
+      // Fetch the data from the SeatAllotment table
+      List<Map<String, dynamic>> seatData = await SeatAllotment().getUserData();
+
+      // Use map to filter only shift and chairNo
+      List<Map<String, dynamic>> filteredData = seatData.map((data) {
+        return {
+          'shift': data['SHIFT'],
+          'chairNo': data['CHAIR_NO'],
+        };
+      }).toList();
+
+      return filteredData;
+    } catch (e) {
+      print("Error fetching and filtering seat data: $e");
+      return [];
+    }
+  }
+
 
 
 }

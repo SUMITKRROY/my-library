@@ -10,6 +10,7 @@ import '../view/admin.dart';
 import '../view/profile.dart';
 import '../view/register_screen.dart';
 import '../view/seat_Allotment.dart';
+import '../view/total_collection.dart';
 
 class MyRoutes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -59,6 +60,11 @@ class MyRoutes {
       case RoutePath.register:
         return MaterialPageRoute(
           builder: (_) => RegisterScreen(),
+        );
+        /// Total Collection Screen
+      case RoutePath.totalCollection:
+        return MaterialPageRoute(
+          builder: (_) => TotalCollection(),
         );
 
         case RoutePath.profile:

@@ -32,9 +32,8 @@ class _BookSeatsState extends State<BookSeats> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _dateOfJoiningController = TextEditingController();
   int _selectedPeriodIndex = -1; // To keep track of the selected period index
-  Map<String, dynamic> appDetailSet = {};
-  int _totalMembers = 0; // To hold the total number of members
-  int _totalSeats = 0; // To hold the total number of Seats
+  int _totalMembers = 0;
+  int _totalSeats = 0;
 
   @override
   void initState() {
@@ -57,11 +56,9 @@ class _BookSeatsState extends State<BookSeats> {
     try {
       List<Map<String, dynamic>> data = await SeatAllotment().getUserData();
       List<Map<String, dynamic>> profileData = await ProfileTable().getProfile();
-      print("profileData: $profileData");
       setState(() {
-        _totalMembers = data.length; // Assuming each entry represents a member
+        _totalMembers = data.length;
         _totalSeats = profileData.first['TOTAL_SEATS'];
-        print("_totalMembers: $_totalSeats");
       });
     } catch (e) {
       print("Error fetching total members: $e");
@@ -69,7 +66,6 @@ class _BookSeatsState extends State<BookSeats> {
   }
 
   Future<void> _refreshData() async {
-    // Call the method to fetch data and update the UI
     await _fetchTotalMembers();
   }
 
@@ -104,6 +100,7 @@ class _BookSeatsState extends State<BookSeats> {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
+                    // Seat info columns
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -112,6 +109,7 @@ class _BookSeatsState extends State<BookSeats> {
                         _buildSeatInfoColumn("Un Allotted", "${_totalSeats - _totalMembers}"),
                       ],
                     ),
+                    // Shift selection buttons
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Container(
@@ -131,10 +129,13 @@ class _BookSeatsState extends State<BookSeats> {
                         ),
                       ),
                     ),
+                    // Form fields
                     _buildTextFormField(_memberIdController, "Enter member id"),
                     _buildTextFormField(_nameController, "Enter name"),
                     _buildTextFormField(_amountController, "Enter amount"),
                     _buildTextFormField(_dateOfJoiningController, "Date of Joining", enabled: false),
+
+                    // Get Seat button
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -145,6 +146,12 @@ class _BookSeatsState extends State<BookSeats> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text('Please select a chair before proceeding.'),
+                                  ),
+                                );
+                              } else if (_selectedPeriodIndex == -1) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Please select a shift before proceeding.'),
                                   ),
                                 );
                               } else if (_formKey.currentState!.validate()) {
@@ -163,10 +170,10 @@ class _BookSeatsState extends State<BookSeats> {
                             },
                             child: MyText(label: "Get Seat"),
                           ),
-
                         ),
                       ],
                     ),
+                    // Chair Grid
                     Expanded(
                       child: GridView.builder(
                         physics: BouncingScrollPhysics(),
@@ -237,49 +244,7 @@ class _BookSeatsState extends State<BookSeats> {
     );
   }
 
-  Widget _buildTextFormField(TextEditingController controller, String label, {bool enabled = true}) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: TextFormField(
-        controller: controller,
-        enabled: enabled,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: TextStyle(color: Colors.white),
-          filled: true,
-          fillColor: Colors.transparent,
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.red),
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.red),
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          disabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-        ),
-        validator: (String? value) {
-          if (value == null || value.isEmpty) {
-            return "$label is required";
-          }
-          return null;
-        },
-        style: TextStyle(color: Colors.white),
-      ),
-    );
-  }
-
+  // Builds the shift selection buttons
   Widget _buildPeriodButton(int index, String label) {
     return GestureDetector(
       onTap: () {
@@ -301,39 +266,59 @@ class _BookSeatsState extends State<BookSeats> {
     );
   }
 
-  Widget _buildSeatInfoColumn(String label, String value) {
-    return Column(
-      children: [
-        MyText(label: label),
-        Container(
-          width: 50.w,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10.0),
-            border: Border.all(color: Colors.white),
+  // Builds the form fields for user input
+  Widget _buildTextFormField(TextEditingController controller, String label, {bool enabled = true}) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextFormField(
+        controller: controller,
+        enabled: enabled,
+        style: TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(color: Colors.white),
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.white),
           ),
-          child: MyText(
-            label: value,
-            alignment: true,
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.green),
           ),
         ),
+        validator: (value) {
+          if (value == null || value.trim().isEmpty) {
+            return 'Please enter a valid value';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  // Builds the seat info display columns
+  Widget _buildSeatInfoColumn(String title, String count) {
+    return Column(
+      children: [
+        MyText(label: title, fontColor: Colors.white),
+        MyText(label: count, fontColor: Colors.white),
       ],
     );
   }
 
-  String _getShiftLabel(int index) {
-    switch (index) {
+  // Gets the shift label based on the selected index
+  String _getShiftLabel(int selectedIndex) {
+    switch (selectedIndex) {
       case 0:
-        return 'Morning';
+        return "Morning";
       case 1:
-        return 'Afternoon';
+        return "Afternoon";
       case 2:
-        return 'Evening';
+        return "Evening";
       case 3:
-        return 'Night';
+        return "Night";
       case 4:
-        return 'FullDay';
+        return "FullDay";
       default:
-        return '';
+        return "";
     }
   }
 }

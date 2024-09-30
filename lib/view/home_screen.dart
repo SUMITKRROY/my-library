@@ -22,7 +22,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late PageController _pageController;
   int _currentPage = 0;
   Timer? _timer;
-  String userName = "User Name"; // Default name, will be updated from the database
+  String userName =
+      "User Name"; // Default name, will be updated from the database
 
   final Map<String, dynamic> product = {
     "library": {
@@ -37,12 +38,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final Map<String, dynamic> grid_Details = {
     "PREMIUM_BOUTIQUES": [
-      {"icon": "", "heading": "Live Member", "count": "0"},
-      {"icon": "", "heading": "Total Member", "count": "1"},
-      {"icon": "", "heading": "Expired Member", "count": "3"},
-      {"icon": "", "heading": "Total Collection", "count": "5"},
-      {"icon": "", "heading": "Total Exp", "count": "2"},
-      {"icon": "", "heading": "Due Amount", "count": "4"}
+      {
+        "heading": "Live Member",
+      },
+      {
+        "heading": "Total Member",
+      },
+      {
+        "heading": "Expired Member",
+      },
+      {
+        "heading": "Collection report",
+      },
     ]
   };
 
@@ -81,21 +88,28 @@ class _HomeScreenState extends State<HomeScreen> {
     ProfileTable profileTable = ProfileTable();
     var profile = await profileTable.getLoggedInProfile();
     setState(() {
-      userName = profile?['Name'] ?? "User Name"; // Update userName from the profile
+      userName =
+          profile?['Name'] ?? "User Name"; // Update userName from the profile
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: MyText(label: "My Library", fontSize: 24, fontColor: Colors.white),
+        title:
+            MyText(label: "My Library", fontSize: 24, fontColor: Colors.white),
         actions: [
-          IconButton(onPressed: () {
-            Navigator.pushNamed(context, RoutePath.profile);
-          }, icon: Icon(Icons.person_3_rounded)),
-          IconButton(onPressed: () {
-            Navigator.pushNamed(context, RoutePath.bookSeats);
-          }, icon: Icon(Icons.chair_alt)),
+          IconButton(
+              onPressed: () {
+                Navigator.pushNamed(context, RoutePath.profile);
+              },
+              icon: Icon(Icons.person_3_rounded)),
+          IconButton(
+              onPressed: () {
+                Navigator.pushNamed(context, RoutePath.bookSeats);
+              },
+              icon: Icon(Icons.chair_alt)),
         ],
       ),
       drawer: Drawer(
@@ -133,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
               leading: Icon(Icons.picture_as_pdf, color: Colors.white),
               title: Text('pdf screen', style: TextStyle(color: Colors.white)),
               onTap: () {
-               Navigator.pushNamed(context, RoutePath.pdfPage);
+                Navigator.pushNamed(context, RoutePath.pdfPage);
                 // Navigate to home screen if not already there
               },
             ),
@@ -192,19 +206,27 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 itemCount: grid_Details['PREMIUM_BOUTIQUES'].length,
                 itemBuilder: (context, index) {
-                  String gridTitle = grid_Details['PREMIUM_BOUTIQUES'][index]['heading'];
+                  String gridTitle =
+                      grid_Details['PREMIUM_BOUTIQUES'][index]['heading'];
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.pushNamed(
-                          context,
-                          RoutePath.memberScreen,
-                          arguments: MemberScreen(
-                            title: gridTitle,
-                            index: index,
-                          ),
-                        );
+                        if (index == 3) {
+                          Navigator.pushNamed(
+                            context,
+                            RoutePath.totalCollection,
+                          );
+                        } else {
+                          Navigator.pushNamed(
+                            context,
+                            RoutePath.memberScreen,
+                            arguments: MemberScreen(
+                              title: gridTitle,
+                              index: index,
+                            ),
+                          );
+                        }
                       },
                       child: Container(
                         decoration: BoxDecoration(
