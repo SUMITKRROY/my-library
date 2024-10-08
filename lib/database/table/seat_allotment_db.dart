@@ -4,10 +4,12 @@ import '../database_helper.dart';
 class SeatAllotment {
   static const String SEAT_ALLOTMENT = "SEAT_ALLOTMENT";
   static const String shift = "SHIFT";
+  static const String shiftIndex = "Shift_Index";
   static const String name = "Name";
   static const String amount = "Amount";
   static const String memberId = "MEMBER_ID";
   static const String chairNo = "CHAIR_NO";
+  static const String chairIndex = "Chair_Index";
   static const String dateOfJoining = "Date_Of_Joining";
   static const String memberStatus = "MemberStatus";
 
@@ -18,7 +20,9 @@ class SeatAllotment {
     $memberId TEXT PRIMARY KEY,
     $name TEXT DEFAULT '',
     $shift TEXT DEFAULT '',
+    $shiftIndex TEXT DEFAULT '',
     $chairNo TEXT DEFAULT '',
+    $chairIndex TEXT DEFAULT '',
     $amount TEXT DEFAULT '',
     $dateOfJoining TEXT DEFAULT '',
     $memberStatus TEXT DEFAULT ''
