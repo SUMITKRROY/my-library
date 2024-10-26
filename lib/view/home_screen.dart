@@ -8,8 +8,8 @@ import '../component/container.dart';
 import '../component/mybutton.dart';
 import '../database/table/seat_allotment_db.dart';
 import '../database/table/user_profile_db.dart';
-import 'login_screen.dart';
-import 'member.dart';
+import 'auth/login_screen.dart';
+import 'member detail/member.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   };
 
   final Map<String, dynamic> grid_Details = {
-    "PREMIUM_BOUTIQUES": [
+    "Card_Name": [
       {
         "heading": "Live Member",
       },
@@ -49,6 +49,9 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       {
         "heading": "Collection report",
+      },
+      {
+        "heading": "Reminder",
       },
     ]
   };
@@ -204,10 +207,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisSpacing: 8.0,
                   mainAxisSpacing: 8.0,
                 ),
-                itemCount: grid_Details['PREMIUM_BOUTIQUES'].length,
+                itemCount: grid_Details['Card_Name'].length,
                 itemBuilder: (context, index) {
                   String gridTitle =
-                      grid_Details['PREMIUM_BOUTIQUES'][index]['heading'];
+                      grid_Details['Card_Name'][index]['heading'];
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
@@ -216,6 +219,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           Navigator.pushNamed(
                             context,
                             RoutePath.totalCollection,
+                          );
+                        } else if (index == 4) {
+                          Navigator.pushNamed(
+                            context,
+                            RoutePath.reminderPage,
                           );
                         } else {
                           Navigator.pushNamed(

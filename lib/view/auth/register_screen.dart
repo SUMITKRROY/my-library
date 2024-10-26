@@ -6,7 +6,7 @@ import 'package:mylibrary/component/myTextForm.dart';
 import 'package:mylibrary/route/pageroute.dart';
 import 'package:mylibrary/utils/utils.dart';
 
-import '../database/table/user_profile_db.dart';
+import '../../database/table/user_profile_db.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);

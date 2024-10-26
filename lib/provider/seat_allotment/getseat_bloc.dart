@@ -29,14 +29,16 @@ class GetSeatBloc extends Bloc<GetSeatEvent, GetSeatState> {
       try {
         Map<String, dynamic> appDetailSet = {};
         appDetailSet[SeatAllotment.shift] = event.selectedShift;
+        appDetailSet[SeatAllotment.shiftIndex] = event.selectedShiftIndex; // Storing the selected shift index as int
         appDetailSet[SeatAllotment.memberId] = event.memberId;
         appDetailSet[SeatAllotment.name] = event.name;
-        appDetailSet[SeatAllotment.chairNo] = event.chairNo; // Storing the selected chair index
+        appDetailSet[SeatAllotment.chairNo] = event.chairNo; // Storing the selected chair number
+        appDetailSet[SeatAllotment.chairIndex] = event.chairIndex; // Storing the selected chair index as int
         appDetailSet[SeatAllotment.amount] = event.amount;
         appDetailSet[SeatAllotment.dateOfJoining] = event.dateOfJoining;
         appDetailSet[SeatAllotment.memberStatus] = 'Active';
         await SeatAllotment().insert(appDetailSet);
-        emit(GetSeatSuccess());  // Emit success state if the insertion was successful
+        emit(GetSeatSuccess());
       } catch (e) {
         emit(GetSeatError("Error inserting seat: ${e.toString()}"));
       }

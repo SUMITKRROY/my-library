@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylibrary/route/pageroute.dart';
 
-import 'login_screen.dart';
+
 
 class WelcomeScreen extends StatelessWidget {
   @override
@@ -70,5 +70,3 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 }
-
-

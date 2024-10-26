@@ -41,8 +41,7 @@ class _BookSeatsState extends State<BookSeats> {
     super.initState();
     _selectedChairIndex = -1; // No chair selected initially
     _selectedPeriodIndex = 0; // Automatically select the Morning shift
-    _dateOfJoiningController.text =
-        Utils.getFormattedDate(DateTime.now()); // Set today's date
+    _dateOfJoiningController.text = Utils.getFormattedDate(DateTime.now()); // Set today's date
     _fetchTotalMembers();
   }
 
@@ -128,12 +127,10 @@ class _BookSeatsState extends State<BookSeats> {
             fontColor: Colors.white,
           ),
         ),
-        // Set resizeToAvoidBottomInset to true to avoid overflow when keyboard is opened
         resizeToAvoidBottomInset: true,
         body: RefreshIndicator(
           onRefresh: _refreshData,
           child: SingleChildScrollView(
-            // Wrap the content in SingleChildScrollView to make it scrollable
             child: Form(
               key: _formKey,
               child: GradientContainer(
@@ -173,12 +170,12 @@ class _BookSeatsState extends State<BookSeats> {
                       ),
                       // Form fields
                       _buildTextFormField(
-                          _memberIdController, "Enter member id"),
-                      _buildTextFormField(_nameController, "Enter name"),
-                      _buildTextFormField(_amountController, "Enter amount"),
+                          _memberIdController, "Enter member id", keyboardType: TextInputType.number),
+                      _buildTextFormField(_nameController, "Enter name", keyboardType: TextInputType.name),
+                      _buildTextFormField(_amountController, "Enter amount", keyboardType: TextInputType.number),
                       _buildTextFormField(
                           _dateOfJoiningController, "Date of Joining",
-                          enabled: false),
+                          enabled: false, keyboardType: TextInputType.none),
 
                       // Get Seat button
                       Row(
@@ -203,21 +200,23 @@ class _BookSeatsState extends State<BookSeats> {
                                   );
                                 } else if (_formKey.currentState!.validate()) {
                                   context.read<GetSeatBloc>().add(
-                                        InsertSeatEvent(
-                                          selectedShift: _getShiftLabel(
-                                              _selectedPeriodIndex),
-                                          memberId:
-                                              _memberIdController.text.trim(),
-                                          chairNo:
-                                              "S-${_selectedChairIndex + 1}",
-                                          memberStatus: 'Active',
-                                          name: _nameController.text.trim(),
-                                          amount: _amountController.text.trim(),
-                                          dateOfJoining:
-                                              _dateOfJoiningController.text
-                                                  .trim(), selectedShiftIndex: _selectedPeriodIndex.toString(), chairIndex: _selectedChairIndex.toString(),
-                                        ),
-                                      );
+                                    InsertSeatEvent(
+                                      selectedShift: _getShiftLabel(
+                                          _selectedPeriodIndex),
+                                      memberId:
+                                      _memberIdController.text.trim(),
+                                      chairNo:
+                                      "S-${_selectedChairIndex + 1}",
+                                      memberStatus: 'Active',
+                                      name: _nameController.text.trim(),
+                                      amount: int.tryParse(_amountController.text.trim()) ?? 0, // Convert to int
+                                      dateOfJoining:
+                                      _dateOfJoiningController.text
+                                          .trim(),
+                                      selectedShiftIndex: _selectedPeriodIndex,
+                                      chairIndex: _selectedChairIndex,
+                                    ),
+                                  );
                                 }
                               },
                               child: MyText(label: "Get Seat"),
@@ -225,31 +224,39 @@ class _BookSeatsState extends State<BookSeats> {
                           ),
                         ],
                       ),
-                      // Chair Grid
-                      // Wrapped inside a fixed-size container to avoid overflow
+
+                      // Filtered Chair Grid
+                      // Showing only chairs for the selected shift
                       SizedBox(
-                        height: MediaQuery.of(context).size.height *
-                            0.4, // Limit grid height to 40% of the screen
+                        height: MediaQuery.of(context).size.height * 0.4, // Limit grid height to 40% of the screen
                         child: GridView.builder(
                           physics: BouncingScrollPhysics(),
                           padding: EdgeInsets.all(8.0),
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3,
                             childAspectRatio: 1,
                             crossAxisSpacing: 8.0,
                             mainAxisSpacing: 8.0,
                           ),
-                          itemCount: widget.totalSeats.isNotEmpty
-                              ? int.parse(widget.totalSeats)
-                              : 0,
+                          itemCount: widget.totalSeats.isNotEmpty ? int.parse(widget.totalSeats) : 0,
                           itemBuilder: (context, index) {
+                            // Check if the chair is already allocated in the selected shift
+                            bool isChairAllocated = shiftData[_getShiftLabel(_selectedPeriodIndex)]?.contains("S-${index + 1}") ?? false;
+
                             return GestureDetector(
                               onTap: () {
-                                setState(() {
-                                  _selectedChairIndex =
-                                      _selectedChairIndex == index ? -1 : index;
-                                });
+                                if (isChairAllocated) {
+                                  // If chair is already allocated, show a message and don't allow selection
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Chair S-${index + 1} is already allotted in ${_getShiftLabel(_selectedPeriodIndex)} shift.'),
+                                    ),
+                                  );
+                                } else {
+                                  setState(() {
+                                    _selectedChairIndex = _selectedChairIndex == index ? -1 : index;
+                                  });
+                                }
                               },
                               child: Semantics(
                                 label: 'Seat ${index + 1}',
@@ -259,18 +266,17 @@ class _BookSeatsState extends State<BookSeats> {
                                       child: Image.asset(
                                         ImagePath.chair,
                                         fit: BoxFit.cover,
+                                        color: isChairAllocated ? Colors.red.withOpacity(0.5) : null, // Red overlay for allocated chairs
                                       ),
                                     ),
                                     Positioned(
                                       bottom: 4,
                                       left: 2,
                                       child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 6, vertical: 2),
+                                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                         decoration: BoxDecoration(
                                           color: Colors.green,
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(10)),
+                                          borderRadius: BorderRadius.all(Radius.circular(10)),
                                         ),
                                         child: MyText(
                                           label: 'S-${index + 1}',
@@ -288,6 +294,16 @@ class _BookSeatsState extends State<BookSeats> {
                                           size: 24,
                                         ),
                                       ),
+                                    if (isChairAllocated)
+                                      Positioned(
+                                        top: 8,
+                                        left: 8,
+                                        child: Icon(
+                                          Icons.lock,
+                                          color: Colors.red,
+                                          size: 24,
+                                        ),
+                                      ),
                                   ],
                                 ),
                               ),
@@ -295,6 +311,7 @@ class _BookSeatsState extends State<BookSeats> {
                           },
                         ),
                       ),
+
                     ],
                   ),
                 ),
@@ -329,9 +346,12 @@ class _BookSeatsState extends State<BookSeats> {
     );
   }
 
-  // Builds the form fields for user input
-  Widget _buildTextFormField(TextEditingController controller, String label,
-      {bool enabled = true}) {
+// Builds the form fields for user input
+  Widget _buildTextFormField(
+      TextEditingController controller,
+      String label,
+      {required TextInputType keyboardType, bool enabled = true}) {
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
@@ -348,6 +368,7 @@ class _BookSeatsState extends State<BookSeats> {
             borderSide: BorderSide(color: Colors.green),
           ),
         ),
+        keyboardType: keyboardType, // User must specify this
         validator: (value) {
           if (value == null || value.trim().isEmpty) {
             return 'Please enter a valid value';
@@ -357,6 +378,7 @@ class _BookSeatsState extends State<BookSeats> {
       ),
     );
   }
+
 
   // Builds the seat info display columns
   Widget _buildSeatInfoColumn(String title, String count) {

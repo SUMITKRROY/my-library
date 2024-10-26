@@ -10,8 +10,16 @@ class MemberSuccess extends MemberState {
 }
 
 class MemberTotalCollectionSuccess extends MemberState {
-  final double totalCollection;
-  MemberTotalCollectionSuccess(this.totalCollection);
+  final int totalCollection;
+  final int activeMembersCount;
+  final int inactiveMembersCount;
+  final List<Map<String, dynamic>> collections;
+  MemberTotalCollectionSuccess({
+    required this.totalCollection,
+    required this.activeMembersCount,
+    required this.inactiveMembersCount,
+    required this.collections,
+  });
 }
 
 class MemberFailure extends MemberState {

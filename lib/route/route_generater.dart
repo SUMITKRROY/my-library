@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:mylibrary/view/home_screen.dart';
-import 'package:mylibrary/view/login_screen.dart';
+import 'package:mylibrary/view/auth/login_screen.dart';
 import 'package:mylibrary/route/pageroute.dart';
-import 'package:mylibrary/view/member.dart';
-import 'package:mylibrary/view/verifyOtp.dart';
+
+
 
 import '../splash.dart';
 import '../view/admin.dart';
+import '../view/member detail/member.dart';
 import '../view/profile.dart';
-import '../view/register_screen.dart';
+import '../view/auth/register_screen.dart';
+import '../view/reminder_screen.dart';
+import '../view/reminder_screen.dart';
 import '../view/seat_Allotment.dart';
 import '../view/total_collection.dart';
 
@@ -32,11 +35,7 @@ class MyRoutes {
           builder: (_) => LoginScreen(),
         );
 
-    /// OTP Verify Screen
-      case RoutePath.otpVerify:
-        return MaterialPageRoute(
-          builder: (_) => VerifyOtpScreen(),
-        );
+
 
     /// Member Screen
       case RoutePath.memberScreen:
@@ -77,12 +76,12 @@ class MyRoutes {
           builder: (_) => PdfPage(),
         );
     //
-    // /// Terms Screen
-    //   case RoutePath.termsAndConditions:
-    //     return MaterialPageRoute(
-    //       builder: (_) => TermsConditionScreen(),
-    //     );
-    //
+    /// ReminderPage Screen
+      case RoutePath.reminderPage:
+        return MaterialPageRoute(
+          builder: (_) => ReminderPage(),
+        );
+
     // /// Version Screen
     //   case RoutePath.versionScreen:
     //     return MaterialPageRoute(

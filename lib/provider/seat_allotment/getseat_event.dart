@@ -7,28 +7,29 @@ class GetSeatSuccessEvent extends GetSeatEvent {}
 
 class InsertSeatEvent extends GetSeatEvent {
   final String selectedShift;
-  final String selectedShiftIndex;
+  final int selectedShiftIndex;
   final String memberId;
   final String name;
   final String chairNo;
-  final String chairIndex;
-  final String amount;
+  final int chairIndex;
+  final int amount; // Change amount to int
   final String dateOfJoining;
   final String memberStatus;
 
   // Constructor with required parameters
-  InsertSeatEvent( {
-
+  InsertSeatEvent({
     required this.selectedShift,
     required this.selectedShiftIndex,
     required this.memberId,
     required this.name,
     required this.chairNo,
     required this.chairIndex,
-    required this.amount,
+    required this.amount, // Ensure this is passed as an int
     required this.dateOfJoining,
     required this.memberStatus,
   });
 }
+
+
 
 class DeleteAllSeatsEvent extends GetSeatEvent {}

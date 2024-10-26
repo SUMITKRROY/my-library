@@ -10,5 +10,6 @@ class RoutePath {
   static const String pdfPage = "/PdfPage";
   static const String profile = "/Profile";
   static const String totalCollection = "/TotalCollection";
+  static const String reminderPage = "/ReminderPage";
 
 }

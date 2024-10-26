@@ -10,16 +10,17 @@ abstract class MemberEvent extends Equatable {
 class FetchMembersEvent extends MemberEvent {
  final int index;
 
- const FetchMembersEvent(this.index);
+ const FetchMembersEvent({required this.index});
 
  @override
  List<Object> get props => [index];
 }
 
 class UpdateMemberStatusEvent extends MemberEvent {
+ final int index;
  final String memberId;
 
- const UpdateMemberStatusEvent(this.memberId);
+ const UpdateMemberStatusEvent({required this.memberId, required this.index});
 
  @override
  List<Object> get props => [memberId];

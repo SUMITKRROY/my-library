@@ -4,7 +4,7 @@ import 'package:mylibrary/component/myText.dart';
 import 'package:mylibrary/component/myTextForm.dart';
 import 'package:mylibrary/route/pageroute.dart';
 import 'package:mylibrary/utils/utils.dart';
-import '../database/table/user_profile_db.dart'; // Import your ProfileTable class
+import '../../database/table/user_profile_db.dart'; // Import your ProfileTable class
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);

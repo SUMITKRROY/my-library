@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import '../database_helper.dart';
 
@@ -13,21 +14,23 @@ class SeatAllotment {
   static const String dateOfJoining = "Date_Of_Joining";
   static const String memberStatus = "MemberStatus";
 
-  static const String totalCollection = "TotalCollection";
+  // static const String totalCollection = "TotalCollection";
 
   static const String CREATE = '''
-    CREATE TABLE IF NOT EXISTS $SEAT_ALLOTMENT (
-    $memberId TEXT PRIMARY KEY,
-    $name TEXT DEFAULT '',
-    $shift TEXT DEFAULT '',
-    $shiftIndex TEXT DEFAULT '',
-    $chairNo TEXT DEFAULT '',
-    $chairIndex TEXT DEFAULT '',
-    $amount TEXT DEFAULT '',
-    $dateOfJoining TEXT DEFAULT '',
-    $memberStatus TEXT DEFAULT ''
-    )
-  ''';
+CREATE TABLE IF NOT EXISTS $SEAT_ALLOTMENT (
+  $memberId TEXT PRIMARY KEY,
+  $name TEXT DEFAULT '',
+  $shift TEXT DEFAULT '',
+  $shiftIndex INTEGER DEFAULT 0,
+  $chairNo TEXT DEFAULT '',
+  $chairIndex INTEGER DEFAULT 0,
+  $amount INTEGER DEFAULT 0, 
+  $dateOfJoining TEXT DEFAULT '',
+  $memberStatus TEXT DEFAULT ''
+)
+''';
+
+
 
   // Define a function that inserts notes into the database
   Future<void> insert(Map<String, dynamic> map) async {
@@ -80,6 +83,24 @@ class SeatAllotment {
   }
 
 
+  Future<void> activateMemberStatus({required String memberId}) async {
+    DatabaseHelper databaseHelper = DatabaseHelper();
+    final db = await databaseHelper.database;
+
+    try {
+      // Update the member status to 'active'
+      await db.update(
+        SEAT_ALLOTMENT,
+        {memberStatus: 'Active'}, // Set the status to active
+        where: 'MEMBER_ID = ?', // Use the column name MEMBER_ID correctly
+        whereArgs: [memberId], // Bind the memberId argument
+      );
+      print("Successfully updated member ID: $memberId to status: active");
+    } catch (e) {
+      print("Error updating member status to active: $e");
+    }
+  }
+
   Future<void> updateMemberStatus({required String memberId}) async {
     DatabaseHelper databaseHelper = DatabaseHelper();
     final db = await databaseHelper.database;
@@ -88,29 +109,36 @@ class SeatAllotment {
       // Update the member status to 'inactive'
       await db.update(
         SEAT_ALLOTMENT,
-        {'$memberStatus': 'inactive'}, // Set the column name correctly to 'MemberStatus'
-        where: 'MEMBER_ID = ?', // Update where MEMBER_ID matches
+        {memberStatus: 'inactive'}, // Set the status to inactive
+        where: 'MEMBER_ID = ?', // Use the column name MEMBER_ID correctly
         whereArgs: [memberId], // Bind the memberId argument
       );
       print("Successfully updated member ID: $memberId to status: inactive");
     } catch (e) {
-      print("Error updating member status: $e");
+      print("Error updating member status to inactive: $e");
     }
   }
 
-// Define a function that calculates the total collection from the 'Amount' field
-  Future<double> getTotalCollection() async {
+
+  Future<int> getTotalCollection() async {
     DatabaseHelper databaseHelper = DatabaseHelper();
     final db = await databaseHelper.database;
 
-    // Query the sum of the 'Amount' field from the database
-    var result = await db.rawQuery('SELECT SUM(CAST($amount AS $totalCollection)) as total FROM $SEAT_ALLOTMENT');
+    try {
+      // Use the SUM aggregate function to calculate the total amount
+      final List<Map<String, dynamic>> result = await db.rawQuery(
+          'SELECT SUM($amount) as total FROM $SEAT_ALLOTMENT where $memberStatus = "Active"'
+      );
 
-    // Extract the total value from the query result
-    if (result.isNotEmpty && result[0]['total'] != null) {
-      return result[0]['total'] as double;
-    } else {
-      return 0.0; // Return 0 if no values are present
+      // If there's a result, return the total amount, otherwise return 0
+      if (result.isNotEmpty && result.first['total'] != null) {
+        return result.first['total'] as int;
+      } else {
+        return 0; // No records found
+      }
+    } catch (e) {
+      print("Error calculating total collection: $e");
+      return 0; // Return 0 in case of an error
     }
   }
 
@@ -131,6 +159,35 @@ class SeatAllotment {
       return filteredData;
     } catch (e) {
       print("Error fetching and filtering seat data: $e");
+      return [];
+    }
+  }
+
+
+  Future<List<Map<String, dynamic>>> getUsersEligibleForReminder() async {
+    DatabaseHelper databaseHelper = DatabaseHelper();
+    final db = await databaseHelper.database;
+
+    try {
+      // Fetch all users with their joining date
+      final List<Map<String, dynamic>> members = await db.query(SEAT_ALLOTMENT);
+
+      // Get today's date
+      final DateTime today = DateTime.now();
+
+      // Filter members who joined 30 days ago
+      List<Map<String, dynamic>> eligibleMembers = members.where((member) {
+        final String? dateStr = member[dateOfJoining];
+        if (dateStr != null && dateStr.isNotEmpty) {
+          DateTime joiningDate = DateFormat('dd/MM/yyyy').parse(dateStr); // Use 'dd/MM/yyyy' format
+          return today.difference(joiningDate).inDays >= 30;
+        }
+        return false;
+      }).toList();
+
+      return eligibleMembers;
+    } catch (e) {
+      print("Error checking eligible members for reminder: $e");
       return [];
     }
   }

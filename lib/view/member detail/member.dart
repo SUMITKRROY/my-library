@@ -1,13 +1,13 @@
+// member_screen_view.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mylibrary/component/container.dart';
 import 'package:mylibrary/component/myText.dart';
-import 'package:mylibrary/utils/theme_changer.dart';
-import '../database/table/seat_allotment_db.dart';
-import '../provider/member_details/member_details_bloc.dart';
-import '../provider/member_details/member_details_event.dart';
-import '../provider/member_details/member_details_state.dart';
+import '../../provider/member_details/member_details_bloc.dart';
+import '../../utils/theme_changer.dart';
+import '../../provider/member_details/member_details_state.dart';
+import 'member_controller.dart';
 
 class MemberScreen extends StatefulWidget {
   final String title;
@@ -20,21 +20,32 @@ class MemberScreen extends StatefulWidget {
 }
 
 class _MemberScreenState extends State<MemberScreen> {
-  late MemberBloc _memberBloc;
+  late MemberScreenController controller;
 
   @override
   void initState() {
     super.initState();
-    _memberBloc = MemberBloc(SeatAllotment());
-
-    // Pass the index to the Bloc to fetch members
-    _memberBloc.add(FetchMembersEvent(widget.index));
+    controller = MemberScreenController(widget.index);
   }
 
   @override
   void dispose() {
-    _memberBloc.close();
+    controller.dispose();
     super.dispose();
+  }
+
+  // Helper function to get the "no members" message based on index
+  String getNoMembersMessage() {
+    switch (widget.index) {
+      case 0:
+        return 'No Active Live Member ';
+      case 1:
+        return 'No Active Members';
+      case 2:
+        return 'No Unactive Members';
+      default:
+        return 'Currently Data Empty';
+    }
   }
 
   @override
@@ -44,24 +55,23 @@ class _MemberScreenState extends State<MemberScreen> {
         title: MyText(label: widget.title, fontSize: 18, fontColor: Colors.white),
       ),
       body: BlocBuilder<MemberBloc, MemberState>(
-        bloc: _memberBloc,
+        bloc: controller.memberBloc,
         builder: (context, state) {
           if (state is MemberLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is MemberSuccess) {
             return GradientContainer(
               child: state.members.isEmpty
-                  ? Center(child: MyText(label: 'No Active Members'))
-                  :ListView.builder(
+                  ? Center(child: MyText(label: getNoMembersMessage()))
+                  : ListView.builder(
                 itemCount: state.members.length,
                 itemBuilder: (context, index) {
-                  print("state : ${state}");
                   // Determine the color based on member status
                   Color cardColor = state.members[index]['MemberStatus'] == 'inactive'
                       ? Colors.red
                       : ColorsData.backToTopBackgroundColor;
 
-                  Color iconbutton = state.members[index]['MemberStatus'] == 'inactive'
+                  Color iconButtonColor = state.members[index]['MemberStatus'] == 'inactive'
                       ? Colors.white
                       : Colors.red;
 
@@ -77,23 +87,30 @@ class _MemberScreenState extends State<MemberScreen> {
                         padding: const EdgeInsets.all(12.0),
                         child: ListTile(
                           leading: MyText(label: 'ID: ${state.members[index]['MEMBER_ID']}'),
-                          title: MyText(label: 'Shift: ${state.members[index]['SHIFT']}', fontSize: 16.sp),
-                          subtitle: MyText(label: 'Chair No: ${state.members[index]['CHAIR_NO']}', fontSize: 12.sp),
-                          trailing: IconButton(
+                          title: MyText(
+                              label: 'Shift: ${state.members[index]['SHIFT']}',
+                              fontSize: 16.sp),
+                          subtitle: MyText(
+                              label: 'Chair No: ${state.members[index]['CHAIR_NO']}',
+                              fontSize: 12.sp),
+                          trailing: widget.index == 1
+                              ? null
+                              : IconButton(
                             onPressed: () {
-                              _memberBloc.add(UpdateMemberStatusEvent(state.members[index]['MEMBER_ID']));
+                              // Call the updateMemberStatus function in the controller
+                              controller.updateMemberStatus(
+                                  memberId: state.members[index]['MEMBER_ID'],
+                                  index: widget.index);
                             },
-                            icon: Icon(Icons.delete),
-                            color:
-                            iconbutton
+                            icon: const Icon(Icons.delete),
+                            color: iconButtonColor,
                           ),
                         ),
                       ),
                     ),
                   );
                 },
-              )
-
+              ),
             );
           } else if (state is MemberFailure) {
             return Center(child: Text('Error: ${state.error}'));
@@ -104,4 +121,3 @@ class _MemberScreenState extends State<MemberScreen> {
     );
   }
 }
-
