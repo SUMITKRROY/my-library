@@ -33,36 +33,37 @@ class _ReminderPageState extends State<ReminderPage> {
         child: eligibleMembers.isEmpty
             ? Center(child: Text("No members have completed 30 days yet."))
             : ListView.builder(
-          itemCount: eligibleMembers.length,
-          itemBuilder: (context, index) {
-            final member = eligibleMembers[index];
-            return Card(
-              elevation: 4,
-              margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Member ID: ${member['MEMBER_ID']}",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                itemCount: eligibleMembers.length,
+                itemBuilder: (context, index) {
+                  final member = eligibleMembers[index];
+                  return Card(
+                    elevation: 4,
+                    margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Member ID: ${member['MEMBER_ID']}",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 4),
+                          Text("Amount: ${member['Amount']}"),
+                          SizedBox(height: 4),
+                          Text(
+                              "Date of Joining: ${member[SeatAllotment.dateOfJoining]}"),
+                          SizedBox(height: 4),
+                          Text(
+                            "30 days complete!",
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ],
+                      ),
                     ),
-                    SizedBox(height: 4),
-                    Text("Amount: ${member['Amount']}"),
-                    SizedBox(height: 4),
-                    Text("Date of Joining: ${member[SeatAllotment.dateOfJoining]}"),
-                    SizedBox(height: 4),
-                    Text(
-                      "30 days complete!",
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
-            );
-          },
-        ),
       ),
     );
   }
