@@ -149,6 +149,24 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         SizedBox(height: 20.sp),
+                        InkWell(
+                            child: const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: CircleAvatar(
+                                radius: 25.0,
+                                backgroundColor: Colors.transparent,
+                                backgroundImage:
+                                AssetImage('assets/images/Google.png'),
+                              ),
+                            ),
+                            onTap: () {
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) =>
+                              //         const WelcomeScreen()));
+                            }),
+                        SizedBox(height: 20.sp),
                         Padding(
                           padding: EdgeInsets.symmetric(vertical: 10.h),
                           child: Row(

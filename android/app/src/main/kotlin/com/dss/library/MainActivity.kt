@@ -1,4 +1,4 @@
-package com.seeting.mylibrary
+package com.dss.library
 
 import io.flutter.embedding.android.FlutterActivity
 

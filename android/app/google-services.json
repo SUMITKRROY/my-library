@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "668764689770",
+    "project_id": "my-library-a2671",
+    "storage_bucket": "my-library-a2671.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:668764689770:android:df17bc321edeb6ab758113",
+        "android_client_info": {
+          "package_name": "com.dss.library"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPFOukzUE2BN-bxZmm22A2W7sjrhdAyyQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
