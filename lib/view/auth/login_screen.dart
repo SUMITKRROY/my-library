@@ -4,6 +4,7 @@ import 'package:mylibrary/component/myText.dart';
 import 'package:mylibrary/component/myTextForm.dart';
 import 'package:mylibrary/route/pageroute.dart';
 import 'package:mylibrary/utils/utils.dart';
+import 'package:mylibrary/view/auth/social_login.dart';
 import '../../database/table/user_profile_db.dart'; // Import your ProfileTable class
 
 class LoginScreen extends StatefulWidget {
@@ -149,23 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         SizedBox(height: 20.sp),
-                        InkWell(
-                            child: const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: CircleAvatar(
-                                radius: 25.0,
-                                backgroundColor: Colors.transparent,
-                                backgroundImage:
-                                AssetImage('assets/images/Google.png'),
-                              ),
-                            ),
-                            onTap: () {
-                              // Navigator.push(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //         builder: (context) =>
-                              //         const WelcomeScreen()));
-                            }),
+                        SocialLogin(),
                         SizedBox(height: 20.sp),
                         Padding(
                           padding: EdgeInsets.symmetric(vertical: 10.h),
