@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mylibrary/component/myText.dart';
 import 'package:mylibrary/route/pageroute.dart';
 import 'package:mylibrary/route/route_generater.dart';
@@ -19,6 +21,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final GoogleSignIn googleSignIn = GoogleSignIn();
+
+  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+
+  User? _currentUser;
+
+  bool _isLoading = false;
   late PageController _pageController;
   int _currentPage = 0;
   Timer? _timer;
@@ -167,7 +176,9 @@ class _HomeScreenState extends State<HomeScreen> {
               title: Text('Logout', style: TextStyle(color: Colors.white)),
               onTap: () {
                 // Handle logout action
-                Navigator.pushReplacementNamed(context, RoutePath.login);
+                _signOut();
+
+
               },
             ),
           ],
@@ -272,4 +283,16 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+  Future<void> _signOut() async {
+    await googleSignIn.signOut();
+    await firebaseAuth.signOut();
+    setState(() {
+      _currentUser = null;
+    });
+    if (_currentUser== null){
+      Navigator.pushReplacementNamed(context, RoutePath.login);
+    }
+  }
 }
+
+
