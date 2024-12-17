@@ -7,15 +7,16 @@ import 'package:intl/intl.dart';
 
 class Utils {
   //dialog
-  static showLoadingProgress(BuildContext context) {
-    return showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Center(
-        child: CircularProgressIndicator(),
-      ));
-
-  }
+  // static showLoadingProgress(BuildContext context) {
+  //   return showDialog(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (context) => SpinKitCubeGrid(
+  //       color: Theme.of(context).secondaryHeaderColor,
+  //       size: 50,
+  //     ),
+  //   );
+  // }
 
   static String getFormattedDate(DateTime date) {
     final DateFormat formatter = DateFormat('dd/MM/yyyy'); // Customize the format
