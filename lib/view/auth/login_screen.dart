@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylibrary/component/myText.dart';
@@ -5,6 +6,7 @@ import 'package:mylibrary/component/myTextForm.dart';
 import 'package:mylibrary/route/pageroute.dart';
 import 'package:mylibrary/utils/utils.dart';
 import 'package:mylibrary/view/auth/social_login.dart';
+import '../../database/table/seat_allotment_db.dart';
 import '../../database/table/user_profile_db.dart'; // Import your ProfileTable class
 
 class LoginScreen extends StatefulWidget {
@@ -112,13 +114,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 _email.text,
                                 _password.text,
                               );
-
                               if (isAuthorized) {
-                                Navigator.pushNamed(context, RoutePath.homeScreen);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Login Successful')),
-                                );
-                              } else {
+                                await checkDatabaseAndNavigate(context);
+                              }
+                              else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(content: Text('You are not authorized')),
                                 );
@@ -189,23 +188,78 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // Function to handle login by checking the database
+
   Future<bool> login(String email, String password) async {
     try {
-      ProfileTable profileTable = ProfileTable();
-      List<Map<String, dynamic>> profiles = await profileTable.getProfile();
-      for (var profile in profiles) {
-        if (profile[ProfileTable.email] == email &&
-            profile[ProfileTable.password] == password) {
-          // Update login status to true
-          await profileTable.updateLoginStatus(profile[ProfileTable.userId], true);
-          return true; // Email and password match
-        }
+      // Firebase sign-in with email and password
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+
+      return userCredential.user != null; // Login successful
+    } on FirebaseAuthException catch (e) {
+      // Handle different Firebase exceptions
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided.');
       }
-      return false; // No match found
+      return false;
     } catch (e) {
-      print("Login error: $e");
-      return false; // Handle errors
+      print('Login error: $e');
+      return false; // Handle general errors
     }
   }
+
+  Future<void> checkDatabaseAndNavigate(BuildContext context) async {
+    // Create an instance of your SeatAllotment class
+    SeatAllotment seatAllotment = SeatAllotment();
+
+    try {
+      // Get the data from the database
+      List<Map<String, dynamic>> userData = await seatAllotment.getUserData();
+print("user${userData}");
+      // Check if the database is empty
+      if (userData.isEmpty) {
+        // Navigate to the registration page if empty
+        Navigator.pushNamed(context, RoutePath.register);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No data found. Redirecting to Register Page')),
+        );
+      } else {
+        // Navigate to the home page if data exists
+        Navigator.pushNamed(context, RoutePath.homeScreen);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login Successful')),
+        );
+      }
+    } catch (e) {
+      // Handle any potential errors
+      print("Error checking database: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
+
+
+// // Function to handle login by checking the database
+  // Future<bool> login(String email, String password) async {
+  //   try {
+  //     ProfileTable profileTable = ProfileTable();
+  //     List<Map<String, dynamic>> profiles = await profileTable.getProfile();
+  //     for (var profile in profiles) {
+  //       if (profile[ProfileTable.email] == email &&
+  //           profile[ProfileTable.password] == password) {
+  //         // Update login status to true
+  //         await profileTable.updateLoginStatus(profile[ProfileTable.userId], true);
+  //         return true; // Email and password match
+  //       }
+  //     }
+  //     return false; // No match found
+  //   } catch (e) {
+  //     print("Login error: $e");
+  //     return false; // Handle errors
+  //   }
+  // }
 }

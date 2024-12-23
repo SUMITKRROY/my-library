@@ -83,17 +83,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          MyTextForm(
-                            label: 'User Id',
-                            controller: _userId,
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(08),
-                            ],
-                            keyboardType: TextInputType.text,
-                            validator: true,
-                            validatorFunc: Utils.userIdValidator(),
-                            onChanged: (String ) {  },
-                          ),
+                          // MyTextForm(
+                          //   label: 'User Id',
+                          //   controller: _userId,
+                          //   inputFormatters: [
+                          //     LengthLimitingTextInputFormatter(08),
+                          //   ],
+                          //   keyboardType: TextInputType.text,
+                          //   validator: true,
+                          //   validatorFunc: Utils.userIdValidator(),
+                          //   onChanged: (String ) {  },
+                          // ),
                           SizedBox(
                             height: 20.sp,
                           ),
@@ -122,17 +122,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           SizedBox(
                             height: 20.sp,
                           ),
-                          MyTextForm(
-                            label: 'Email',
-                            controller: _email,
-                            keyboardType: TextInputType.emailAddress,
-                            validator: true,
-                            validatorFunc: Utils.emailValidator(),
-                            onChanged: (String ) {  },
-                          ),
-                          SizedBox(
-                            height: 20.sp,
-                          ),
+                          // MyTextForm(
+                          //   label: 'Email',
+                          //   controller: _email,
+                          //   keyboardType: TextInputType.emailAddress,
+                          //   validator: true,
+                          //   validatorFunc: Utils.emailValidator(),
+                          //   onChanged: (String ) {  },
+                          // ),
+                          // SizedBox(
+                          //   height: 20.sp,
+                          // ),
                           MyTextForm(
                             label: 'Total Seats',
                             controller: _totalSeats,
@@ -147,31 +147,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           SizedBox(
                             height: 20.sp,
                           ),
-                          MyTextForm(
-                            label: 'Password',
-                            controller: _password,
-                            keyboardType: TextInputType.text,
-                            textInputAction: TextInputAction.done,
-                            validator: true,
-                            validatorFunc: Utils.passwordValidator(), onChanged: (String ) {  },
-                          ),
-                          SizedBox(
-                            height: 20.sp,
-                          ),
-                          MyTextForm(
-                            label: 'Confirm Password',
-                            controller: _confirmPassword,
-                            keyboardType: TextInputType.text,
-                            textInputAction: TextInputAction.done,
-                            onChanged: (String ) {  },
-                            validator: true,
-                            validatorFunc: (value) {
-                              if (value != _password.text) {
-                                return 'Passwords do not match';
-                              }
-                              return null;
-                            },
-                          ),
+                          // MyTextForm(
+                          //   label: 'Password',
+                          //   controller: _password,
+                          //   keyboardType: TextInputType.text,
+                          //   textInputAction: TextInputAction.done,
+                          //   validator: true,
+                          //   validatorFunc: Utils.passwordValidator(), onChanged: (String ) {  },
+                          // ),
+                          // SizedBox(
+                          //   height: 20.sp,
+                          // ),
+                          // MyTextForm(
+                          //   label: 'Confirm Password',
+                          //   controller: _confirmPassword,
+                          //   keyboardType: TextInputType.text,
+                          //   textInputAction: TextInputAction.done,
+                          //   onChanged: (String ) {  },
+                          //   validator: true,
+                          //   validatorFunc: (value) {
+                          //     if (value != _password.text) {
+                          //       return 'Passwords do not match';
+                          //     }
+                          //     return null;
+                          //   },
+                          // ),
                           SizedBox(
                             height: 20.sp,
                           ),
@@ -197,7 +197,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                               child: const Center(
                                 child: Text(
-                                  'Register',
+                                  'save ',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20,
@@ -209,20 +209,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           SizedBox(
                             height: 20.sp,
                           ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(vertical: 10.h),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                GestureDetector(
-                                  onTap: (){
-                                    Navigator.pushReplacementNamed(context, RoutePath.login);
-                                  },
-                                  child: MyText(label: "Already have an account?",fontColor:  Color(0xff63A6DC), fontSize: 22.sp,),
-                                ),
-                              ],
-                            ),
-                          )
+                          // Padding(
+                          //   padding: EdgeInsets.symmetric(vertical: 10.h),
+                          //   child: Row(
+                          //     mainAxisAlignment: MainAxisAlignment.end,
+                          //     children: [
+                          //       GestureDetector(
+                          //         onTap: (){
+                          //           Navigator.pushReplacementNamed(context, RoutePath.login);
+                          //         },
+                          //         child: MyText(label: "Already have an account?",fontColor:  Color(0xff63A6DC), fontSize: 22.sp,),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // )
                         ],
                       ),
                     ),
@@ -236,12 +236,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void appTableSet(BuildContext context) async {
     try {
-      appDetailSet[ProfileTable.userId] = _userId.text;
+     // appDetailSet[ProfileTable.userId] = _userId.text;
       appDetailSet[ProfileTable.name] = _name.text;
       appDetailSet[ProfileTable.phone] = _phone.text;
-      appDetailSet[ProfileTable.email] = _email.text;
+    //  appDetailSet[ProfileTable.email] = _email.text;
       appDetailSet[ProfileTable.totalSeats] = int.tryParse(_totalSeats.text) ?? 0; // Parse to integer
-      appDetailSet[ProfileTable.password] = _password.text; // Changed to .text
+     // appDetailSet[ProfileTable.password] = _password.text; // Changed to .text
       appDetailSet[ProfileTable.loginStatus] = "true"; // Changed to .text
 
       // Call insert method with profile data and context for navigation

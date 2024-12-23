@@ -178,7 +178,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 // Handle logout action
                 _signOut();
 
-
               },
             ),
           ],
