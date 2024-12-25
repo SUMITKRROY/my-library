@@ -23,7 +23,7 @@ class ProfileTable {
       $totalSeats INTEGER DEFAULT 0,
       $email TEXT DEFAULT '',
       $password TEXT DEFAULT '',
-      $loginStatus TEXT DEFAULT ''
+      $loginStatus INTEGER DEFAULT 0
     )
   ''';
 
@@ -53,24 +53,28 @@ class ProfileTable {
     }
   }
 
-  // Update the login status in the database
-  Future<void> updateLoginStatus(String userId, bool status) async {
+  Future<void> updateLoginStatus({required String userId, required bool status}) async {
     try {
+      // Initialize the database helper and get the database instance
       DatabaseHelper databaseHelper = DatabaseHelper();
       final db = await databaseHelper.database;
+
+      // Update the login status in the database
       await db.update(
-        PROFILE_TABLE,
+        PROFILE_TABLE,  // Your profile table name
         {
-          loginStatus: status ? 'true' : 'false',
+          loginStatus : status ?  1 : 0,  // Update the loginStatus field
         },
-        where: '$userId = ?',
-        whereArgs: [userId],
+        where: 'userId = ?',  // Replace 'userId' with the actual column name in the table
+        whereArgs: [userId],  // The userId value that is being updated
       );
+
       print("Login status updated successfully");
     } catch (e) {
       print("Error updating login status: $e");
     }
   }
+
 
   // Retrieve the profile of the logged-in user
   Future<Map<String, dynamic>?> getLoggedInProfile() async {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mylibrary/component/container.dart';
+import 'package:mylibrary/component/my_container.dart';
 import '../component/myText.dart';
 import '../database/table/seat_allotment_db.dart';
 import '../provider/member_details/member_details_bloc.dart';

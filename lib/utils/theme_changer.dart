@@ -38,7 +38,7 @@ ThemeData lightMode = ThemeData(
   appBarTheme: AppBarTheme(
     iconTheme: IconThemeData(color: Colors.white),
     elevation: 0,
-    backgroundColor: Color(0xff63A6DC),
+    backgroundColor: Colors.deepPurple.withOpacity(0.8),
   ),
     textTheme: const TextTheme(
 titleLarge: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold)),

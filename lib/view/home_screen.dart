@@ -6,9 +6,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mylibrary/component/myText.dart';
 import 'package:mylibrary/route/pageroute.dart';
 import 'package:mylibrary/route/route_generater.dart';
-import '../component/container.dart';
-import '../component/mybutton.dart';
-import '../database/table/seat_allotment_db.dart';
+import 'package:mylibrary/utils/image.dart';
+import '../component/my_container.dart';
 import '../database/table/user_profile_db.dart';
 import 'auth/login_screen.dart';
 import 'member detail/member.dart';
@@ -31,8 +30,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late PageController _pageController;
   int _currentPage = 0;
   Timer? _timer;
-  String userName =
-      "User Name"; // Default name, will be updated from the database
+  String userName = ""; // Default name, will be updated from the database
+  String userId = "";
 
   final Map<String, dynamic> product = {
     "library": {
@@ -48,19 +47,24 @@ class _HomeScreenState extends State<HomeScreen> {
   final Map<String, dynamic> grid_Details = {
     "Card_Name": [
       {
-        "heading": "Live Member",
+        "img": ImagePath.active,
+        "heading": "Active user",
       },
       {
-        "heading": "Total Member",
+        "img": ImagePath.allUser,
+        "heading": "All user",
       },
       {
-        "heading": "Expired Member",
+        "img": ImagePath.inactive,
+        "heading": "Inactive user",
       },
       {
-        "heading": "Collection report",
+        "img": ImagePath.account,
+        "heading": "Account",
       },
       {
-        "heading": "Reminder",
+        "img": ImagePath.addMember,
+        "heading": "Add user",
       },
     ]
   };
@@ -79,36 +83,42 @@ class _HomeScreenState extends State<HomeScreen> {
     _timer?.cancel();
     super.dispose();
   }
+  static const Duration _timerDuration = Duration(seconds: 3); // Timer interval
+  static const Duration _animationDuration = Duration(milliseconds: 300); // Animation speed
+
 
   void _startTimer() {
-    _timer = Timer.periodic(Duration(seconds: 2), (Timer timer) {
-      if (_currentPage < product['library']['banner'].length - 1) {
+    _timer = Timer.periodic(_timerDuration, (Timer timer) {
+      if (_currentPage < product['library']['banner'] - 1) {
         _currentPage++;
       } else {
         _currentPage = 0;
       }
       _pageController.animateToPage(
         _currentPage,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeIn,
+        duration: _animationDuration,
+        curve: Curves.easeInOut,
       );
     });
   }
-
   // Function to fetch user name from the database
   Future<void> _fetchUserName() async {
     ProfileTable profileTable = ProfileTable();
     var profile = await profileTable.getLoggedInProfile();
     setState(() {
-      userName =
-          profile?['Name'] ?? "User Name"; // Update userName from the profile
+      userName = profile?['Name'] ?? "User Name"; // Update userName from the profile
+      userId = profile?['UserId'] ?? "userId"; // Update userName from the profile
+      print("user id $userId");
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
+       // backgroundColor: Colors.deepPurple.withOpacity(0.8),
+        elevation: 0.0,
         title:
             MyText(label: "My Library", fontSize: 24, fontColor: Colors.white),
         actions: [
@@ -119,19 +129,22 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icon(Icons.person_3_rounded)),
           IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, RoutePath.bookSeats);
+                Navigator.pushNamed(
+                  context,
+                  RoutePath.reminderPage,
+                );
               },
-              icon: Icon(Icons.chair_alt)),
+              icon: Icon(Icons.notifications_active)),
         ],
       ),
       drawer: Drawer(
-        backgroundColor: Color(0xff63A6DC),
+        backgroundColor:   Colors.deepPurple,
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
               decoration: BoxDecoration(
-                color: Color(0xff63A6DC),
+                color:   Colors.deepPurple.withOpacity(0.8),
               ),
               child: Column(
                 children: [
@@ -187,7 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             Container(
-              height: 250.h,
+              height: 150.h,
               child: PageView.builder(
                 controller: _pageController,
                 itemCount: product['library']['banner'].length,
@@ -204,16 +217,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             ),
+            SizedBox(height:10.h),
             MyText(
               label: "My Service",
               fontSize: 24,
               fontColor: Colors.white,
               alignment: true,
             ),
+            SizedBox(height:10.h),
             Expanded(
               child: GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
+                  crossAxisCount: 2,
                   crossAxisSpacing: 8.0,
                   mainAxisSpacing: 8.0,
                 ),
@@ -221,6 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemBuilder: (context, index) {
                   String gridTitle =
                       grid_Details['Card_Name'][index]['heading'];
+                 String gridImage =     grid_Details['Card_Name'][index]['img'];
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
@@ -231,10 +247,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             RoutePath.totalCollection,
                           );
                         } else if (index == 4) {
-                          Navigator.pushNamed(
-                            context,
-                            RoutePath.reminderPage,
-                          );
+
+                          Navigator.pushNamed(context, RoutePath.bookSeats);
                         } else {
                           Navigator.pushNamed(
                             context,
@@ -250,6 +264,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         decoration: BoxDecoration(
                           color: Colors.transparent,
                           borderRadius: BorderRadius.circular(8.0),
+                          image: DecorationImage(
+                            image: AssetImage(gridImage), // Provide the image path here
+                            fit: BoxFit.cover, // Adjust how the image is displayed (cover, contain, etc.)
+                          ),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.grey.withOpacity(0.5),
@@ -259,18 +277,28 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ],
                           border: Border.all(
-                            color: Colors.grey,
+                            color: Colors.white12,
                             width: 1.0,
                           ),
                         ),
-                        child: Center(
-                          child: MyText(
-                            label: gridTitle,
-                            fontSize: 14.sp,
-                            fontColor: Colors.white,
-                            alignment: true,
+                        child: Align(
+                          alignment: Alignment.bottomRight,
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.5), // Black background with 50% opacity
+                              borderRadius: BorderRadius.circular(4.0), // Optional: Rounded corners
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), // Add padding for spacing
+                            child:  MyText(
+                              label: gridTitle,
+                              fontSize: 14.sp,
+                              fontColor: Colors.white, // White text color
+                              alignment: true,
+                            ),
                           ),
                         ),
+
                       ),
                     ),
                   );
@@ -283,15 +311,39 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
   Future<void> _signOut() async {
-    await googleSignIn.signOut();
-    await firebaseAuth.signOut();
-    setState(() {
-      _currentUser = null;
-    });
-    if (_currentUser== null){
+    try {
+      // Sign out from Google and Firebase
+      await googleSignIn.signOut();
+      await firebaseAuth.signOut();
+
+      // Clear current user info
+      setState(() {
+        _currentUser = null;
+      });
+      List<Map<String, dynamic>> profiles = await ProfileTable().getProfile();
+      print("cheaked ${profiles.first[ProfileTable.loginStatus]}");
+      String   userId = profiles.first[ProfileTable.userId];
+      // Update login status in the database
+      await ProfileTable().updateLoginStatus(  userId: userId, status: false);
+
+      // Navigate to login page after sign-out and status update
       Navigator.pushReplacementNamed(context, RoutePath.login);
+    } catch (e) {
+      print("Error during sign out: $e");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error during sign out: $e")));
     }
   }
+
+  Future<void> updateLoginStatus(BuildContext context) async {
+    try {
+      // Assuming 'userId' is available here and is the correct identifier
+
+    } catch (e) {
+      print("Error updating login status: $e");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+    }
+  }
+
 }
 
 

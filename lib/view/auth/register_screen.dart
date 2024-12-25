@@ -3,9 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylibrary/component/myText.dart';
 import 'package:mylibrary/component/myTextForm.dart';
+import 'package:mylibrary/component/mybutton.dart';
 import 'package:mylibrary/route/pageroute.dart';
 import 'package:mylibrary/utils/utils.dart';
-
+import 'package:uuid/uuid.dart';
 import '../../database/table/user_profile_db.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -29,220 +30,209 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        body: Stack(
-          children: [
-            Container(
-              height: double.infinity,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(colors: [
-                  Color(0xff63A6DC),
-                  Color(0xff281537),
-                ]),
-              ),
-              child: Padding(
-                padding: EdgeInsets.only(top: 60.h, left: 22, bottom: 40.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Welcome,',
-                      style: TextStyle(
-                          fontSize: 40.sp,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      'to our library!',
-                      style: TextStyle(
-                          fontSize: 35.sp,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 200.h),
-              child: Container(
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(40), topRight: Radius.circular(40)),
-                  color: Colors.white,
-                ),
-                height: double.infinity,
-                width: double.infinity,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 18, vertical: 30.h),
-                  child: SingleChildScrollView(
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // MyTextForm(
-                          //   label: 'User Id',
-                          //   controller: _userId,
-                          //   inputFormatters: [
-                          //     LengthLimitingTextInputFormatter(08),
-                          //   ],
-                          //   keyboardType: TextInputType.text,
-                          //   validator: true,
-                          //   validatorFunc: Utils.userIdValidator(),
-                          //   onChanged: (String ) {  },
-                          // ),
-                          SizedBox(
-                            height: 20.sp,
-                          ),
-                          MyTextForm(
-                            label: 'Name',
-                            controller: _name,
-                            keyboardType: TextInputType.text,
-                            validator: true,
-                        validatorLabel: "name",
-                            onChanged: (String ) {  },
-                          ),
-                          SizedBox(
-                            height: 20.sp,
-                          ),
-                          MyTextForm(
-                            label: 'Phone Number',
-                            controller: _phone,
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(10),
-                            ],
-                            keyboardType: TextInputType.phone,
-                            validator: true,
-                            validatorFunc: Utils.phoneValidator(),
-                            onChanged: (String ) {  },
-                          ),
-                          SizedBox(
-                            height: 20.sp,
-                          ),
-                          // MyTextForm(
-                          //   label: 'Email',
-                          //   controller: _email,
-                          //   keyboardType: TextInputType.emailAddress,
-                          //   validator: true,
-                          //   validatorFunc: Utils.emailValidator(),
-                          //   onChanged: (String ) {  },
-                          // ),
-                          // SizedBox(
-                          //   height: 20.sp,
-                          // ),
-                          MyTextForm(
-                            label: 'Total Seats',
-                            controller: _totalSeats,
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(3),
-                            ],
-                            keyboardType: TextInputType.number,
-                            validator: true,
-                            validatorLabel: "total seats",
-                            onChanged: (String ) {  },
-                          ),
-                          SizedBox(
-                            height: 20.sp,
-                          ),
-                          // MyTextForm(
-                          //   label: 'Password',
-                          //   controller: _password,
-                          //   keyboardType: TextInputType.text,
-                          //   textInputAction: TextInputAction.done,
-                          //   validator: true,
-                          //   validatorFunc: Utils.passwordValidator(), onChanged: (String ) {  },
-                          // ),
-                          // SizedBox(
-                          //   height: 20.sp,
-                          // ),
-                          // MyTextForm(
-                          //   label: 'Confirm Password',
-                          //   controller: _confirmPassword,
-                          //   keyboardType: TextInputType.text,
-                          //   textInputAction: TextInputAction.done,
-                          //   onChanged: (String ) {  },
-                          //   validator: true,
-                          //   validatorFunc: (value) {
-                          //     if (value != _password.text) {
-                          //       return 'Passwords do not match';
-                          //     }
-                          //     return null;
-                          //   },
-                          // ),
-                          SizedBox(
-                            height: 20.sp,
-                          ),
-                          GestureDetector(
-                            onTap: () async {
-                              if (_formKey.currentState!.validate()) {
-                                   appTableSet(context);
-                                // Navigator.pushNamed(context, RoutePath.homeScreen);
-                                // ScaffoldMessenger.of(context).showSnackBar(
-                                //   const SnackBar(content: Text('Processing Data')),
-                                // );
-                              }
-                            },
-                            child: Container(
-                              height: 55,
-                              width: 300,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(30),
-                                gradient: const LinearGradient(colors: [
-                                  Color(0xff63A6DC),
-                                  Color(0xff281537),
-                                ]),
-                              ),
-                              child: const Center(
-                                child: Text(
-                                  'save ',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                      color: Colors.white),
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 20.sp,
-                          ),
-                          // Padding(
-                          //   padding: EdgeInsets.symmetric(vertical: 10.h),
-                          //   child: Row(
-                          //     mainAxisAlignment: MainAxisAlignment.end,
-                          //     children: [
-                          //       GestureDetector(
-                          //         onTap: (){
-                          //           Navigator.pushReplacementNamed(context, RoutePath.login);
-                          //         },
-                          //         child: MyText(label: "Already have an account?",fontColor:  Color(0xff63A6DC), fontSize: 22.sp,),
-                          //       ),
-                          //     ],
-                          //   ),
-                          // )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ));
+  void dispose() {
+    // Dispose of controllers when the widget is disposed to prevent memory leaks
+    _name.dispose();
+    _userId.dispose();
+    _phone.dispose();
+    _email.dispose();
+    _totalSeats.dispose();
+    _password.dispose();
+    _confirmPassword.dispose();
+    super.dispose();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.deepPurple.withOpacity(0.8),
+                Colors.black,
+              ],
+              begin: Alignment.topCenter,
+            ),
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _buildBackground(),
+                _buildFormSection(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Background section with gradient and welcome message
+  Widget _buildBackground() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Welcome,',
+          style: TextStyle(
+            fontSize: 30.sp,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          'to our library!',
+          style: TextStyle(
+            fontSize: 25.sp,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Form section with input fields and buttons
+  Widget _buildFormSection() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 18, vertical: 30.h),
+      child: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              _buildNameField(),
+              SizedBox(height: 20.sp),
+              _buildPhoneField(),
+              SizedBox(height: 20.sp),
+              _buildTotalSeatsField(),
+              SizedBox(height: 20.sp),
+              _buildSaveButton(),
+              // SizedBox(height: 20.sp),
+              // _buildAccountNavigation(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Name input field
+  Widget _buildNameField() {
+    return MyTextForm(
+      label: 'Name',
+      controller: _name,
+      keyboardType: TextInputType.text,
+      validator: true,
+      validatorFunc: Utils.validateUserName(),
+      onChanged: (String ) {  },
+    );
+  }
+
+  // Phone number input field
+  Widget _buildPhoneField() {
+    return MyTextForm(
+      label: 'Phone Number',
+      controller: _phone,
+      inputFormatters: [
+        LengthLimitingTextInputFormatter(10),
+      ],
+      keyboardType: TextInputType.phone,
+        validator: true,
+        validatorFunc: Utils.phoneValidator(), onChanged: (String ) {  },
+    );
+  }
+
+  // Total seats input field
+  Widget _buildTotalSeatsField() {
+    return MyTextForm(
+      label: 'Total Seats',
+      controller: _totalSeats,
+      inputFormatters: [
+        LengthLimitingTextInputFormatter(3),
+      ],
+      keyboardType: TextInputType.number,
+          validator: true,
+
+      onChanged: (String ) {  },
+    );
+  }
+
+  // Save button
+  Widget _buildSaveButton() {
+    return MyButton(
+      onTap: () async {
+        if (_formKey.currentState!.validate()) {
+          appTableSet(context);
+        }
+      },
+      text: "Save",
+      textColor: Colors.white,
+      color: Color(0xffBC30AA).withOpacity(0.7),
+      width: double.infinity,
+      height: 50.h,
+    );
+  }
+
+  // Account navigation link
+  Widget _buildAccountNavigation() {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          GestureDetector(
+            onTap: () {
+              // Navigator.pushReplacementNamed(context, RoutePath.login);
+            },
+            child: MyText(
+              label: "Already have an account?",
+              fontColor: Color(0xff63A6DC),
+              fontSize: 22.sp,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCreateAccountRow(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text(
+          "Exiting User? ",
+          style: TextStyle(color: Colors.white),
+        ),
+        GestureDetector(
+          onTap: () {
+
+          },
+          child: const Text(
+            "Login",
+            style: TextStyle(
+                color: Colors.purpleAccent, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ],
+    );
+  }
+  // Method to save form data to the database
   void appTableSet(BuildContext context) async {
     try {
-     // appDetailSet[ProfileTable.userId] = _userId.text;
+      appDetailSet[ProfileTable.userId] = "123";
       appDetailSet[ProfileTable.name] = _name.text;
       appDetailSet[ProfileTable.phone] = _phone.text;
-    //  appDetailSet[ProfileTable.email] = _email.text;
-      appDetailSet[ProfileTable.totalSeats] = int.tryParse(_totalSeats.text) ?? 0; // Parse to integer
-     // appDetailSet[ProfileTable.password] = _password.text; // Changed to .text
-      appDetailSet[ProfileTable.loginStatus] = "true"; // Changed to .text
+      appDetailSet[ProfileTable.totalSeats] = int.tryParse(_totalSeats.text) ?? 0;
+      appDetailSet[ProfileTable.loginStatus] = 1;
 
       // Call insert method with profile data and context for navigation
       await ProfileTable().insert(appDetailSet, context);
@@ -251,6 +241,4 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
     }
   }
-
-
 }

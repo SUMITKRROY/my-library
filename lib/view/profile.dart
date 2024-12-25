@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';  // Import ScreenUtil
-import '../component/container.dart';
+import '../component/my_container.dart';
+import '../component/mybutton.dart';
 import '../database/table/user_profile_db.dart';
 import '../route/pageroute.dart';
 
@@ -33,8 +34,8 @@ class _ProfilePageState extends State<ProfilePage> {
   // Function to handle logout
   Future<void> _handleLogout() async {
     ProfileTable profileTable = ProfileTable();
-    if (profileData != null && profileData![ProfileTable.userId] != null) {
-      await profileTable.updateLoginStatus(profileData![ProfileTable.userId], false);
+    if (profileData![ProfileTable.userId] != null) {
+      await profileTable.updateLoginStatus(   userId: profileData![ProfileTable.userId], status: false);
       Navigator.pushReplacementNamed(context, RoutePath.login); // Assuming you have a login screen route
     }
   }
@@ -51,14 +52,14 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         title: Text(
           "Profile",
-          style: TextStyle(fontSize: 18.sp),  // Using ScreenUtil for font size
+          style: TextStyle(fontSize: 18.sp,color: Colors.white),  // Using ScreenUtil for font size
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: _handleLogout,
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: Icon(Icons.logout),
+        //     onPressed: _handleLogout,
+        //   ),
+        // ],
       ),
       body: GradientContainer(
         child: isLoading
@@ -75,13 +76,15 @@ class _ProfilePageState extends State<ProfilePage> {
               _buildProfileRow("Total Seats", profileData![ProfileTable.totalSeats].toString()),
               const SizedBox(height: 30),
               // Centering the logout button
+
               Center(
-                child: ElevatedButton(
-                  onPressed: _handleLogout,
-                  child: Text(
-                    "Logout",
-                    style: TextStyle(fontSize: 16.sp),  // Font size using ScreenUtil
-                  ),
+                child:   MyButton(
+                    onTap: _handleLogout ,
+                    text: "Logout",
+                    textColor: Colors.white,
+                    color: Color(0xffBC30AA).withOpacity(0.7),
+                    width: double.infinity,
+                    height: 50.h
                 ),
               ),
             ],
@@ -101,11 +104,11 @@ class _ProfilePageState extends State<ProfilePage> {
         children: [
           Text(
             label,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),  // Font size with ScreenUtil
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp,color: Colors.white),  // Font size with ScreenUtil
           ),
           Text(
             value,
-            style: TextStyle(fontSize: 14.sp),  // Font size with ScreenUtil
+            style: TextStyle(fontSize: 14.sp,color: Colors.white),  // Font size with ScreenUtil
           ),
         ],
       ),

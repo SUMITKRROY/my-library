@@ -1,42 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class CustomGradientButton extends StatelessWidget {
-  final VoidCallback onTap;
-  final String label;
+class MyButton extends StatelessWidget {
+  final String? text;
+  final void Function()? onTap;
+  final Color? color;
+  final Color? textColor;
+  final double? height;
+  final double? width;
 
-  const CustomGradientButton({
+  // Constructor
+  const MyButton({
     Key? key,
-    required this.onTap,
-    required this.label,
+    this.text,
+    this.onTap,
+    this.color,
+    this.textColor,
+    this.height,
+    this.width,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
       child: Container(
-        height: 55,
-        width: 300,
-        margin: EdgeInsets.only(bottom: 20),
+        height: height,
+        width: width,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          gradient: LinearGradient(
-            colors: [
-              Color(0xff63A6DC),
-              Color(0xff281537),
-            ],
-          ),
+          borderRadius: BorderRadius.circular(15),
+          color: color,
         ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20.sp,
-              color: Colors.white,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            text == null
+                ? SizedBox()
+                : Text(
+              text!,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: textColor,
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

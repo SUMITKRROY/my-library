@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../component/container.dart';
+import '../component/my_container.dart';
 import '../database/table/seat_allotment_db.dart';
 import 'seat_allotment.dart';
 
@@ -27,11 +27,12 @@ class _ReminderPageState extends State<ReminderPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("30-Day Membership Reminders"),
+        titleSpacing: 0,
+        title: Text("30-Day Membership Reminders",style: TextStyle(color: Colors.white),),
       ),
       body: GradientContainer(
         child: eligibleMembers.isEmpty
-            ? Center(child: Text("No members have completed 30 days yet."))
+            ? Center(child: Text("No members have completed 30 days yet.",style: TextStyle(color: Colors.white)))
             : ListView.builder(
                 itemCount: eligibleMembers.length,
                 itemBuilder: (context, index) {

@@ -11,11 +11,10 @@ class GradientContainer extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xff63A6DC),
-            Color(0xff281537),
+            Colors.deepPurple.withOpacity(0.8), // 80% opacity
+            Colors.black // 60% opacity
           ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          begin: Alignment.topCenter,
         ),
       ),
       child: child,

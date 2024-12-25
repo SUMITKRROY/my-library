@@ -5,7 +5,9 @@ import 'package:mylibrary/route/pageroute.dart';
 import 'package:mylibrary/route/route_generater.dart';
 import 'package:mylibrary/utils/image.dart';
 import '../database/table/user_profile_db.dart'; // Import your ProfileTable class
+import 'package:lottie/lottie.dart';
 
+import 'component/my_container.dart';
 class SplashScreen extends StatefulWidget {
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -25,10 +27,10 @@ class _SplashScreenState extends State<SplashScreen> {
     try {
       ProfileTable profileTable = ProfileTable();
       List<Map<String, dynamic>> profiles = await profileTable.getProfile();
-
+      print("cheaked ${profiles.first[ProfileTable.loginStatus]}");
       // Assuming there's only one user profile, or you want to check the first one
       if (profiles.isNotEmpty) {
-        bool loginStatus = profiles[0][ProfileTable.loginStatus] == 'true';
+        bool loginStatus = profiles.first[ProfileTable.loginStatus] == 1;
         print("cheaked ${loginStatus}");
         if (loginStatus) {
           Navigator.pushReplacementNamed(context, RoutePath.homeScreen);
@@ -47,25 +49,15 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xff63A6DC),
-              Color(0xff281537),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
+      body: GradientContainer(
+
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                ImagePath.logo,
-                height: 250.h,
-                width: 250.h,
+              Lottie.asset(
+                "assets/images/SplashAnimation.json",
+                fit: BoxFit.contain, // Ensures the animation fits nicely within the screen
               ),
               SizedBox(
                 height: 10.h,

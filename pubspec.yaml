@@ -50,6 +50,8 @@ dependencies:
   firebase_core: ^3.8.1
   firebase_auth: ^5.3.4
   google_sign_in: ^6.2.2
+  lottie: ^3.2.0
+  uuid: ^4.5.1
 
 dev_dependencies:
   flutter_test:

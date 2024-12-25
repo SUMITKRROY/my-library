@@ -2,8 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mylibrary/component/container.dart';
+
 import 'package:mylibrary/component/myText.dart';
+import '../../component/my_container.dart';
 import '../../provider/member_details/member_details_bloc.dart';
 import '../../utils/theme_changer.dart';
 import '../../provider/member_details/member_details_state.dart';

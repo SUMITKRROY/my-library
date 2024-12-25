@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mylibrary/component/container.dart';
+import 'package:mylibrary/component/my_container.dart';
 import 'package:mylibrary/component/myText.dart';
 import 'package:mylibrary/component/myTextForm.dart';
 import 'package:mylibrary/component/mybutton.dart';
@@ -11,6 +12,7 @@ import 'package:mylibrary/provider/seat_allotment/getseat_bloc.dart';
 import 'package:mylibrary/route/pageroute.dart';
 import 'package:mylibrary/utils/utils.dart';
 import 'package:mylibrary/utils/image.dart';
+import 'package:uuid/uuid.dart';
 
 class BookSeats extends StatefulWidget {
   final String totalSeats;
@@ -36,6 +38,15 @@ class _BookSeatsState extends State<BookSeats> {
   int _totalSeats = 0;
   Map<String, List<String>> shiftData = {};
 
+
+
+// Function to generate and store UUID in the global variable
+  void generateUuid() {
+    var uuid = Uuid();
+    _memberIdController.text = uuid.v4();  // Store the generated UUID in the global variable
+        // Print the generated UUID
+  }
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +54,7 @@ class _BookSeatsState extends State<BookSeats> {
     _selectedPeriodIndex = 0; // Automatically select the Morning shift
     _dateOfJoiningController.text = Utils.getFormattedDate(DateTime.now()); // Set today's date
     _fetchTotalMembers();
+    generateUuid();
   }
 
   @override
@@ -169,57 +181,65 @@ class _BookSeatsState extends State<BookSeats> {
                         ),
                       ),
                       // Form fields
-                      _buildTextFormField(
-                          _memberIdController, "Enter member id", keyboardType: TextInputType.number),
+                      // _buildTextFormField(
+                      //     _memberIdController, "Enter member id", keyboardType: TextInputType.number),
+                      SizedBox(height: 10.h,),
                       _buildTextFormField(_nameController, "Enter name", keyboardType: TextInputType.name),
+                      SizedBox(height: 10.h,),
                       _buildTextFormField(_amountController, "Enter amount", keyboardType: TextInputType.number),
+                      SizedBox(height: 10.h,),
                       _buildTextFormField(
                           _dateOfJoiningController, "Date of Joining",
                           enabled: false, keyboardType: TextInputType.none),
+                      SizedBox(height: 10.h,),
 
                       // Get Seat button
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           Expanded(
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                if (_selectedChairIndex == -1) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                          'Please select a chair before proceeding.'),
-                                    ),
-                                  );
-                                } else if (_selectedPeriodIndex == -1) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                          'Please select a shift before proceeding.'),
-                                    ),
-                                  );
-                                } else if (_formKey.currentState!.validate()) {
-                                  context.read<GetSeatBloc>().add(
-                                    InsertSeatEvent(
-                                      selectedShift: _getShiftLabel(
-                                          _selectedPeriodIndex),
-                                      memberId:
-                                      _memberIdController.text.trim(),
-                                      chairNo:
-                                      "S-${_selectedChairIndex + 1}",
-                                      memberStatus: 'Active',
-                                      name: _nameController.text.trim(),
-                                      amount: int.tryParse(_amountController.text.trim()) ?? 0, // Convert to int
-                                      dateOfJoining:
-                                      _dateOfJoiningController.text
-                                          .trim(),
-                                      selectedShiftIndex: _selectedPeriodIndex,
-                                      chairIndex: _selectedChairIndex,
-                                    ),
-                                  );
-                                }
-                              },
-                              child: MyText(label: "Get Seat"),
+                            child: MyButton(
+                                onTap: () async {
+                                  if (_selectedChairIndex == -1) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            'Please select a chair before proceeding.'),
+                                      ),
+                                    );
+                                  } else if (_selectedPeriodIndex == -1) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            'Please select a shift before proceeding.'),
+                                      ),
+                                    );
+                                  } else if (_formKey.currentState!.validate()) {
+                                    context.read<GetSeatBloc>().add(
+                                      InsertSeatEvent(
+                                        selectedShift: _getShiftLabel(
+                                            _selectedPeriodIndex),
+                                        memberId:
+                                        _memberIdController.text.trim(),
+                                        chairNo:
+                                        "S-${_selectedChairIndex + 1}",
+                                        memberStatus: 'Active',
+                                        name: _nameController.text.trim(),
+                                        amount: int.tryParse(_amountController.text.trim()) ?? 0, // Convert to int
+                                        dateOfJoining:
+                                        _dateOfJoiningController.text
+                                            .trim(),
+                                        selectedShiftIndex: _selectedPeriodIndex,
+                                        chairIndex: _selectedChairIndex,
+                                      ),
+                                    );
+                                  }
+                                },
+                                text: "Get Seat",
+                                textColor: Colors.white,
+                                color: Color(0xffBC30AA).withOpacity(0.7),
+                                width: double.infinity,
+                                height: 50.h
                             ),
                           ),
                         ],
@@ -228,9 +248,9 @@ class _BookSeatsState extends State<BookSeats> {
                       // Filtered Chair Grid
                       // Showing only chairs for the selected shift
                       SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.4, // Limit grid height to 40% of the screen
+                        height: MediaQuery.of(context).size.height * 0.7, // Limit grid height to 40% of the screen
                         child: GridView.builder(
-                          physics: BouncingScrollPhysics(),
+                            physics: NeverScrollableScrollPhysics() ,
                           padding: EdgeInsets.all(8.0),
                           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3,
@@ -354,27 +374,17 @@ class _BookSeatsState extends State<BookSeats> {
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: TextFormField(
+      child:  MyTextForm(
+        label: label,
         controller: controller,
-        enabled: enabled,
-        style: TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: TextStyle(color: Colors.white),
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-          ),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.green),
-          ),
-        ),
-        keyboardType: keyboardType, // User must specify this
-        validator: (value) {
-          if (value == null || value.trim().isEmpty) {
-            return 'Please enter a valid value';
-          }
-          return null;
-        },
+        inputFormatters: [
+          LengthLimitingTextInputFormatter(30),
+        ],
+        keyboardType: keyboardType,
+        validator: true,
+        validatorFunc: Utils.emailValidator(),
+        //prefix: const Icon(Icons.email, color: Colors.white),
+        onChanged: (String) {},
       ),
     );
   }

@@ -13,35 +13,34 @@ class MyTextForm extends StatefulWidget {
   final TextInputType? keyboardType;
   final bool obscured;
   final bool validator;
-  final dynamic suffixIcon;
+  final dynamic prefix;
   final dynamic validatorFunc;
   final dynamic maxline;
-  final TextInputAction? textInputAction;
+  final bool readOnly;
 
-  const MyTextForm(
-      {super.key,
-      required this.label,
-      this.inputFormatters,
-      this.validatorLabel,
-      this.initialValue,
-      required this.onChanged,
-      this.controller,
-      this.obscured = false,
-      this.suffixIcon,
-      this.keyboardType,
-      this.maxline,
-      required this.validator,
-      this.validatorFunc,
-      this.labelFontSize, this.textInputAction});
+  const MyTextForm({
+    super.key,
+    required this.label,
+    this.inputFormatters,
+    this.validatorLabel,
+    this.initialValue,
+    required this.onChanged,
+    this.controller,
+    this.obscured = false,
+    this.prefix,
+    this.keyboardType,
+    this.maxline,
+    required this.validator,
+    this.validatorFunc,
+    this.labelFontSize,
+    this.readOnly = false,
+  });
 
   @override
-  @override
-  State<MyTextForm> createState() {
-    return _MyTextForm();
-  }
+  State<MyTextForm> createState() => _CustomTextField();
 }
 
-class _MyTextForm extends State<MyTextForm> {
+class _CustomTextField extends State<MyTextForm> {
   late final TextEditingController _controller;
 
   @override
@@ -53,23 +52,23 @@ class _MyTextForm extends State<MyTextForm> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    // _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      readOnly: widget.readOnly,
       onTapOutside: (PointerDownEvent event) {
         FocusManager.instance.primaryFocus?.unfocus();
       },
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      maxLines: widget.maxline,
-      // style: TextStyle(fontSize: 20.sp, color: ColorsData.darkGrayColor),
+      maxLines: widget.maxline ?? 1,
       inputFormatters: widget.inputFormatters,
       validator: widget.validatorFunc ??
-          (val) {
-            if (widget.validator != false) {
+              (val) {
+            if (widget.validator) {
               if (val == null || val.isEmpty) {
                 return "Enter valid ${widget.validatorLabel}";
               }
@@ -79,21 +78,40 @@ class _MyTextForm extends State<MyTextForm> {
       controller: widget.controller ?? _controller,
       onChanged: widget.onChanged,
       keyboardType: widget.keyboardType,
-      textInputAction: widget.textInputAction ?? TextInputAction.next,
+      textInputAction: TextInputAction.next,
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
+        contentPadding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 20.w),
 
-          //contentPadding: EdgeInsets.all(22.h),
-          suffixIcon: widget.suffixIcon,
-          labelText: widget.label,
-          labelStyle: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
-            color: Color(0xff0c588a),
-          ),
-          errorMaxLines: 2,
-          hintStyle: TextStyle(fontSize: 10.sp),
-          errorStyle: TextStyle(fontSize: 16.sp),
-          filled: false),
+        prefixIcon: widget.prefix,
+        labelText: widget.label,
+        labelStyle: TextStyle(fontSize: widget.labelFontSize ?? 18.sp, color: Colors.white54),
+        hintText: "Enter ${widget.label}",
+        hintStyle: const TextStyle(color: Colors.white54),
+        filled: true,
+        fillColor: Colors.black12,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(width: 1.w, color: Colors.white),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(width: 1.w, color: Colors.white),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(width: 1.w, color: Colors.blueAccent),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(width: 1.w, color: Colors.red),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(width: 1.w, color: Colors.redAccent),
+        ),
+        errorStyle: TextStyle(fontSize: 14.sp, color: Colors.redAccent),
+      ),
       obscureText: widget.obscured,
     );
   }

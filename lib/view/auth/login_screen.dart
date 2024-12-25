@@ -1,13 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylibrary/component/myText.dart';
 import 'package:mylibrary/component/myTextForm.dart';
 import 'package:mylibrary/route/pageroute.dart';
 import 'package:mylibrary/utils/utils.dart';
 import 'package:mylibrary/view/auth/social_login.dart';
+import '../../component/mybutton.dart';
 import '../../database/table/seat_allotment_db.dart';
-import '../../database/table/user_profile_db.dart'; // Import your ProfileTable class
+import '../../utils/image.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -18,186 +20,296 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _email = TextEditingController();
-  TextEditingController _password = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            height: double.infinity,
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xff63A6DC),
-                  Color(0xff281537),
-                ],
-              ),
-            ),
-            child: Padding(
-              padding: EdgeInsets.only(top: 60.h, left: 22, bottom: 40.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Hello,',
-                    style: TextStyle(
-                      fontSize: 40.sp,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    'Sign in!',
-                    style: TextStyle(
-                      fontSize: 35.sp,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.deepPurple.withOpacity(0.8), // 80% opacity
+                Colors.black // 60% opacity
+              ],
+              begin: Alignment.topCenter,
             ),
           ),
-          Padding(
-            padding: EdgeInsets.only(top: 200.h),
-            child: Container(
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(40),
-                  topRight: Radius.circular(40),
-                ),
-                color: Colors.white,
-              ),
-              height: double.infinity,
-              width: double.infinity,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 18, vertical: 30.h),
-                child: SingleChildScrollView(
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        MyTextForm(
-                          label: 'Email',
-                          onChanged: (value) {
-                            print('Text changed: $value');
-                          },
-                          keyboardType: TextInputType.emailAddress,
-                          controller: _email,
-                          validator: false,
-                          validatorFunc: Utils.emailValidator(),
-                        ),
-                        SizedBox(height: 20.sp),
-                        MyTextForm(
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.done,
-                          label: 'Password',
-                          onChanged: (value) {
-                            print('Text changed: $value');
-                          },
-                          controller: _password,
-                          validator: false,
-                          validatorFunc: Utils.passwordValidator(),
-                          validatorLabel: 'Password',
-                        ),
-                        SizedBox(height: 20.sp),
-                        GestureDetector(
-                          onTap: () async {
-                            // Validate returns true if the form is valid, or false otherwise.
-                            if (_formKey.currentState!.validate()) {
-                              bool isAuthorized = await login(
-                                _email.text,
-                                _password.text,
-                              );
-                              if (isAuthorized) {
-                                await checkDatabaseAndNavigate(context);
-                              }
-                              else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('You are not authorized')),
-                                );
-                              }
-                            }
-                          },
-                          child: Container(
-                            height: 55,
-                            width: 300,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30),
-                              gradient: const LinearGradient(
-                                colors: [
-                                  Color(0xff63A6DC),
-                                  Color(0xff281537),
-                                ],
-                              ),
-                            ),
-                            child: const Center(
-                              child: Text(
-                                'Login',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 20.sp),
-                        SocialLogin(),
-                        SizedBox(height: 20.sp),
-                        Padding(
-                          padding: EdgeInsets.symmetric(vertical: 10.h),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.pushReplacementNamed(
-                                      context, RoutePath.register);
-                                },
-                                child: MyText(
-                                  label: "Create",
-                                  fontColor: Color(0xff63A6DC),
-                                  fontSize: 22.sp,
-                                ),
-                              ),
-                              SizedBox(width: 4.w),
-                              MyText(
-                                label: "New Account ?",
-                                fontColor: Colors.black,
-                                fontSize: 18.sp,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+          child: Center( // Ensures everything is centered vertically and horizontally
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center, // Center items vertically
+              crossAxisAlignment: CrossAxisAlignment.center, // Center items horizontally
+              children: [
+                _buildHeader(),
+                _buildLoginForm(context),
+              ],
             ),
           ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Text(
+      "Login",
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 24.sp,
+        fontWeight: FontWeight.bold,
+        fontStyle: FontStyle.italic,
+      ),
+    );
+  }
+
+  Widget _buildLoginForm(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 18, vertical: 30.h),
+      child: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildEmailField(),
+              SizedBox(height: 20.sp),
+              _buildPasswordField(),
+              SizedBox(height: 20.sp),
+              _buildLoginButton(context),
+              // SizedBox(height: 20.sp),
+              // SocialLogin(),
+              SizedBox(height: 20.sp),
+              _buildCreateAccountRow(context),
+              SizedBox(height: 20.sp,),
+              //_otherFeature(context)
+            ],
+          ),
+        ),
       ),
     );
   }
 
 
-  Future<bool> login(String email, String password) async {
+
+  Widget _buildSafeLogin(BuildContext context){
+    return SafeArea(
+      child: Center(
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Login",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+
+                      SizedBox(height: 20.h),
+                      MyTextForm(
+                        label: "Email",
+                        controller: _emailController,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(30),
+                        ],
+                        keyboardType: TextInputType.emailAddress,
+                        validator: true,
+                        validatorFunc: Utils.emailValidator(),
+                        prefix: const Icon(Icons.email, color: Colors.white),
+                        onChanged: (String) {},
+                      ),
+                      SizedBox(height: 20.h),
+                      MyTextForm(
+                        label: "Password",
+                        controller: _passwordController,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(16),
+                        ],
+                        keyboardType: TextInputType.text,
+                        validator: true,
+                        validatorFunc: Utils.passwordValidator(),
+                        validatorLabel: "Password",
+                        prefix: const Icon(Icons.password, color: Colors.white),
+                        onChanged: (String) {},
+                      ),
+
+
+                      SizedBox(height: 20.h),
+                      MyButton(
+                          onTap: (){} ,
+                          text: "Log In",
+                          textColor: Colors.white,
+                          color: Color(0xffBC30AA).withOpacity(0.7),
+                          width: double.infinity,
+                          height: 50.h
+                      ),
+                      SizedBox(height: 20.sp),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "New User? ",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+
+                            },
+                            child: const Text(
+                              "Create an account",
+                              style: TextStyle(
+                                  color: Colors.purpleAccent, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 150.h),
+                         Image.asset("assets/images/headset.png"),
+                      SizedBox(
+                        height: 5.h,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          // Support Action
+                        },
+                        child: Text(
+                          "Need Support",
+                          style: TextStyle(
+                              color: Colors.blueAccent,
+                              fontSize: 16.sp,
+                              decoration: TextDecoration.underline),
+                        ),
+                      ),
+                    ],
+                  )
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+}
+
+  Widget _buildEmailField() {
+    return    MyTextForm(
+      label: "Email",
+      controller: _emailController,
+      inputFormatters: [
+        LengthLimitingTextInputFormatter(30),
+      ],
+      keyboardType: TextInputType.emailAddress,
+      validator: true,
+      validatorFunc: Utils.emailValidator(),
+      prefix: const Icon(Icons.email, color: Colors.white),
+      onChanged: (String) {},
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return   MyTextForm(
+      label: "Password",
+      controller: _passwordController,
+      inputFormatters: [
+        LengthLimitingTextInputFormatter(16),
+      ],
+      keyboardType: TextInputType.text,
+      validator: true,
+      validatorFunc: Utils.passwordValidator(),
+      validatorLabel: "Password",
+      prefix: const Icon(Icons.lock, color: Colors.white),
+      onChanged: (String) {},
+    );
+  }
+
+  Widget _buildLoginButton(BuildContext context) {
+    return MyButton(
+      onTap: () async {
+        if (_formKey.currentState!.validate()) {
+          bool isAuthorized = await _login(_emailController.text, _passwordController.text);
+          if (isAuthorized) {
+            await _checkDatabaseAndNavigate(context);
+          } else {
+            _showSnackbar(context, 'You are not authorized');
+          }
+        }
+      },
+        text: "Log In",
+        textColor: Colors.white,
+        color: Color(0xffBC30AA).withOpacity(0.7),
+        width: double.infinity,
+        height: 50.h
+    );
+  }
+  Widget _otherFeature(BuildContext context) {
+    return Column(
+      children: [
+      //  SizedBox(height: 150.h),
+        Image.asset(
+          ImagePath.headset,
+          // height: 250.h,
+          // width: 250.h,
+        ),
+        SizedBox(
+          height: 5.h,
+        ),
+        GestureDetector(
+          onTap: () {
+            // Support Action
+          },
+          child: Text(
+            "Need Support",
+            style: TextStyle(
+                color: Colors.blueAccent,
+                fontSize: 16.sp,
+                decoration: TextDecoration.underline),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCreateAccountRow(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text(
+          "New User? ",
+          style: TextStyle(color: Colors.white),
+        ),
+        GestureDetector(
+          onTap: () {
+
+          },
+          child: const Text(
+            "Create an account",
+            style: TextStyle(
+                color: Colors.purpleAccent, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<bool> _login(String email, String password) async {
     try {
-      // Firebase sign-in with email and password
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-
-      return userCredential.user != null; // Login successful
+      return userCredential.user != null;
     } on FirebaseAuthException catch (e) {
-      // Handle different Firebase exceptions
       if (e.code == 'user-not-found') {
         print('No user found for that email.');
       } else if (e.code == 'wrong-password') {
@@ -206,60 +318,37 @@ class _LoginScreenState extends State<LoginScreen> {
       return false;
     } catch (e) {
       print('Login error: $e');
-      return false; // Handle general errors
+      return false;
     }
   }
 
-  Future<void> checkDatabaseAndNavigate(BuildContext context) async {
-    // Create an instance of your SeatAllotment class
+  Future<void> _checkDatabaseAndNavigate(BuildContext context) async {
     SeatAllotment seatAllotment = SeatAllotment();
-
     try {
-      // Get the data from the database
       List<Map<String, dynamic>> userData = await seatAllotment.getUserData();
-print("user${userData}");
-      // Check if the database is empty
       if (userData.isEmpty) {
-        // Navigate to the registration page if empty
         Navigator.pushNamed(context, RoutePath.register);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No data found. Redirecting to Register Page')),
-        );
+        _showSnackbar(context, 'No data found. Redirecting to Register Page');
       } else {
-        // Navigate to the home page if data exists
         Navigator.pushNamed(context, RoutePath.homeScreen);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login Successful')),
-        );
+        _showSnackbar(context, 'Login Successful');
       }
     } catch (e) {
-      // Handle any potential errors
       print("Error checking database: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      _showSnackbar(context, 'Error: $e');
     }
   }
 
+  void _showSnackbar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
 
-
-// // Function to handle login by checking the database
-  // Future<bool> login(String email, String password) async {
-  //   try {
-  //     ProfileTable profileTable = ProfileTable();
-  //     List<Map<String, dynamic>> profiles = await profileTable.getProfile();
-  //     for (var profile in profiles) {
-  //       if (profile[ProfileTable.email] == email &&
-  //           profile[ProfileTable.password] == password) {
-  //         // Update login status to true
-  //         await profileTable.updateLoginStatus(profile[ProfileTable.userId], true);
-  //         return true; // Email and password match
-  //       }
-  //     }
-  //     return false; // No match found
-  //   } catch (e) {
-  //     print("Login error: $e");
-  //     return false; // Handle errors
-  //   }
-  // }
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 }
