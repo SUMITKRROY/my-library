@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';  // Import ScreenUtil
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../component/my_container.dart';
 import '../component/mybutton.dart';
 import '../database/table/user_profile_db.dart';
@@ -11,7 +11,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  Map<String, dynamic>? profileData;
+  List<Map<String, dynamic>> profileData = [];
   bool isLoading = true;
 
   @override
@@ -20,77 +20,89 @@ class _ProfilePageState extends State<ProfilePage> {
     _getProfileData();
   }
 
-  // Function to get profile data from the database
+  // Fetch profile data from the database
   Future<void> _getProfileData() async {
-    ProfileTable profileTable = ProfileTable();
-    var data = await profileTable.getLoggedInProfile();
+    try {
+      ProfileTable profileTable = ProfileTable();
+      var data = await profileTable.getProfile();
 
-    setState(() {
-      profileData = data;
-      isLoading = false;
-    });
+      setState(() {
+        profileData = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print("Error fetching profile data: $e");
+    }
   }
 
-  // Function to handle logout
+  // Handle logout functionality
   Future<void> _handleLogout() async {
-    ProfileTable profileTable = ProfileTable();
-    if (profileData![ProfileTable.userId] != null) {
-      await profileTable.updateLoginStatus(   userId: profileData![ProfileTable.userId], status: false);
-      Navigator.pushReplacementNamed(context, RoutePath.login); // Assuming you have a login screen route
+    if (profileData.isNotEmpty) {
+      try {
+        ProfileTable profileTable = ProfileTable();
+        final userId = profileData.first[ProfileTable.userId];
+
+        if (userId != null) {
+          await profileTable.updateLoginStatus(userId: userId, status: false);
+          Navigator.pushReplacementNamed(context, RoutePath.login);
+        }
+      } catch (e) {
+        print("Error during logout: $e");
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Initialize ScreenUtil for responsive sizing
     ScreenUtil.init(
       context,
-      designSize: const Size(360, 690),  // Adjust based on your app's design dimensions
+      designSize: const Size(360, 690),
     );
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
           "Profile",
-          style: TextStyle(fontSize: 18.sp,color: Colors.white),  // Using ScreenUtil for font size
+          style: TextStyle(fontSize: 18.sp, color: Colors.white),
         ),
-        // actions: [
-        //   IconButton(
-        //     icon: Icon(Icons.logout),
-        //     onPressed: _handleLogout,
-        //   ),
-        // ],
       ),
       body: GradientContainer(
         child: isLoading
-            ? Center(child: CircularProgressIndicator())
-            : profileData != null
+            ? const Center(child: CircularProgressIndicator())
+            : profileData.isNotEmpty
             ? Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildProfileRow("Name", profileData![ProfileTable.name] ?? ""),
-              _buildProfileRow("Phone", profileData![ProfileTable.phone] ?? ""),
-              _buildProfileRow("Email", profileData![ProfileTable.email] ?? ""),
-              _buildProfileRow("Total Seats", profileData![ProfileTable.totalSeats].toString()),
+              _buildProfileRow("Name", profileData.first[ProfileTable.name] ?? ""),
+              _buildProfileRow("Phone", profileData.first[ProfileTable.phone] ?? ""),
+              _buildProfileRow("Email", profileData.first[ProfileTable.email] ?? ""),
+              _buildProfileRow(
+                  "Total Seats", profileData.first[ProfileTable.totalSeats]?.toString() ?? "0"),
               const SizedBox(height: 30),
-              // Centering the logout button
-
               Center(
-                child:   MyButton(
-                    onTap: _handleLogout ,
-                    text: "Logout",
-                    textColor: Colors.white,
-                    color: Color(0xffBC30AA).withOpacity(0.7),
-                    width: double.infinity,
-                    height: 50.h
+                child: MyButton(
+                  onTap: _handleLogout,
+                  text: "Logout",
+                  textColor: Colors.white,
+                  color: const Color(0xffBC30AA).withOpacity(0.7),
+                  width: double.infinity,
+                  height: 50.h,
                 ),
               ),
             ],
           ),
         )
-            : Center(child: Text('No profile data found', style: TextStyle(fontSize: 16.sp))),
+            : Center(
+          child: Text(
+            'No profile data found',
+            style: TextStyle(fontSize: 16.sp, color: Colors.white),
+          ),
+        ),
       ),
     );
   }
@@ -104,11 +116,14 @@ class _ProfilePageState extends State<ProfilePage> {
         children: [
           Text(
             label,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp,color: Colors.white),  // Font size with ScreenUtil
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: Colors.white),
           ),
-          Text(
-            value,
-            style: TextStyle(fontSize: 14.sp,color: Colors.white),  // Font size with ScreenUtil
+          Flexible(
+            child: Text(
+              value,
+              style: TextStyle(fontSize: 14.sp, color: Colors.white),
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),

@@ -9,6 +9,7 @@ import 'package:mylibrary/utils/utils.dart';
 import 'package:mylibrary/view/auth/social_login.dart';
 import '../../component/mybutton.dart';
 import '../../database/table/seat_allotment_db.dart';
+import '../../database/table/user_profile_db.dart';
 import '../../utils/image.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -22,6 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false; // Loading state
 
   @override
   Widget build(BuildContext context) {
@@ -236,24 +238,36 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildLoginButton(BuildContext context) {
-    return MyButton(
+    return _isLoading
+        ? CircularProgressIndicator() // Show loading indicator
+        : MyButton(
       onTap: () async {
         if (_formKey.currentState!.validate()) {
+          setState(() {
+            _isLoading = true; // Start loading
+          });
+
           bool isAuthorized = await _login(_emailController.text, _passwordController.text);
+
           if (isAuthorized) {
             await _checkDatabaseAndNavigate(context);
           } else {
             _showSnackbar(context, 'You are not authorized');
           }
+
+          setState(() {
+            _isLoading = false; // Stop loading
+          });
         }
       },
-        text: "Log In",
-        textColor: Colors.white,
-        color: Color(0xffBC30AA).withOpacity(0.7),
-        width: double.infinity,
-        height: 50.h
+      text: "Log In",
+      textColor: Colors.white,
+      color: Color(0xffBC30AA).withOpacity(0.7),
+      width: double.infinity,
+      height: 50.h,
     );
   }
+
   Widget _otherFeature(BuildContext context) {
     return Column(
       children: [
@@ -323,19 +337,22 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _checkDatabaseAndNavigate(BuildContext context) async {
-    SeatAllotment seatAllotment = SeatAllotment();
+    ProfileTable profileTable = ProfileTable();
     try {
-      List<Map<String, dynamic>> userData = await seatAllotment.getUserData();
+      List<Map<String, dynamic>> userData = await profileTable.getProfile();
+      String   userId = userData.first[ProfileTable.userId];
       if (userData.isEmpty) {
         Navigator.pushNamed(context, RoutePath.register);
         _showSnackbar(context, 'No data found. Redirecting to Register Page');
       } else {
+        await ProfileTable().updateLoginStatus(  userId: userId, status: true);
         Navigator.pushNamed(context, RoutePath.homeScreen);
         _showSnackbar(context, 'Login Successful');
       }
     } catch (e) {
       print("Error checking database: $e");
       _showSnackbar(context, 'Error: $e');
+      Navigator.pushReplacementNamed(context, RoutePath.register);
     }
   }
 

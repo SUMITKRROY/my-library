@@ -26,7 +26,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   TextEditingController _password = TextEditingController();
   TextEditingController _confirmPassword = TextEditingController();
   Map<String, dynamic> appDetailSet = {};
-
+  bool _isLoading = false; // Loading state
 
 
   @override
@@ -59,13 +59,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _buildBackground(),
-                _buildFormSection(),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _buildBackground(),
+                  _buildFormSection(),
+                ],
+              ),
             ),
           ),
         ),
@@ -102,24 +104,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget _buildFormSection() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 18, vertical: 30.h),
-      child: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              _buildNameField(),
-              SizedBox(height: 20.sp),
-              _buildPhoneField(),
-              SizedBox(height: 20.sp),
-              _buildTotalSeatsField(),
-              SizedBox(height: 20.sp),
-              _buildSaveButton(),
-              // SizedBox(height: 20.sp),
-              // _buildAccountNavigation(),
-            ],
-          ),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            _buildNameField(),
+            SizedBox(height: 20.sp),
+            _buildPhoneField(),
+            SizedBox(height: 20.sp),
+            _buildTotalSeatsField(),
+            SizedBox(height: 20.sp),
+            _buildSaveButton(),
+            // SizedBox(height: 20.sp),
+            // _buildAccountNavigation(),
+          ],
         ),
       ),
     );
@@ -168,10 +168,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // Save button
   Widget _buildSaveButton() {
-    return MyButton(
+    return  _isLoading
+        ? CircularProgressIndicator() // Show loading indicator
+        :MyButton(
       onTap: () async {
         if (_formKey.currentState!.validate()) {
+          setState(() {
+            _isLoading = true; // Start loading
+          });
           appTableSet(context);
+          setState(() {
+            _isLoading = false; // Stop loading
+          });
         }
       },
       text: "Save",

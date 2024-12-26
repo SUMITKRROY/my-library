@@ -32,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _timer;
   String userName = ""; // Default name, will be updated from the database
   String userId = "";
+  List<Map<String, dynamic>> profile = [];
 
   final Map<String, dynamic> product = {
     "library": {
@@ -89,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _startTimer() {
     _timer = Timer.periodic(_timerDuration, (Timer timer) {
-      if (_currentPage < product['library']['banner'] - 1) {
+      if (_currentPage < product['library']['banner']-1) {
         _currentPage++;
       } else {
         _currentPage = 0;
@@ -104,10 +105,11 @@ class _HomeScreenState extends State<HomeScreen> {
   // Function to fetch user name from the database
   Future<void> _fetchUserName() async {
     ProfileTable profileTable = ProfileTable();
-    var profile = await profileTable.getLoggedInProfile();
+      var data = await profileTable.getProfile();
     setState(() {
-      userName = profile?['Name'] ?? "User Name"; // Update userName from the profile
-      userId = profile?['UserId'] ?? "userId"; // Update userName from the profile
+      profile = data;
+      userName = profile.first['Name'] ?? "User Name"; // Update userName from the profile
+      userId = profile.first['UserId'] ?? "userId"; // Update userName from the profile
       print("user id $userId");
     });
   }
