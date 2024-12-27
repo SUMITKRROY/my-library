@@ -61,6 +61,7 @@ class _MemberScreenState extends State<MemberScreen> {
           if (state is MemberLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is MemberSuccess) {
+            print(state.members);
             return GradientContainer(
               child: state.members.isEmpty
                   ? Center(child: MyText(label: getNoMembersMessage()))
@@ -70,7 +71,7 @@ class _MemberScreenState extends State<MemberScreen> {
                   // Determine the color based on member status
                   Color cardColor = state.members[index]['MemberStatus'] == 'inactive'
                       ? Colors.red
-                      : ColorsData.backToTopBackgroundColor;
+                      : Colors.deepPurple.withOpacity(0.8);
 
                   Color iconButtonColor = state.members[index]['MemberStatus'] == 'inactive'
                       ? Colors.white
@@ -86,26 +87,31 @@ class _MemberScreenState extends State<MemberScreen> {
                       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
-                        child: ListTile(
-                          leading: MyText(label: 'ID: ${state.members[index]['MEMBER_ID']}'),
-                          title: MyText(
-                              label: 'Shift: ${state.members[index]['SHIFT']}',
-                              fontSize: 16.sp),
-                          subtitle: MyText(
-                              label: 'Chair No: ${state.members[index]['CHAIR_NO']}',
-                              fontSize: 12.sp),
-                          trailing: widget.index == 1
-                              ? null
-                              : IconButton(
-                            onPressed: () {
-                              // Call the updateMemberStatus function in the controller
-                              controller.updateMemberStatus(
-                                  memberId: state.members[index]['MEMBER_ID'],
-                                  index: widget.index);
-                            },
-                            icon: const Icon(Icons.delete),
-                            color: iconButtonColor,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            MyText(label: ' ${state.members[index]['Name']}',fontSize: 24.sp,),
+                            ListTile(
+                              title: MyText(
+                                  label: 'Shift: ${state.members[index]['SHIFT']}',
+                                  fontSize: 16.sp),
+                              subtitle: MyText(
+                                  label: 'Chair No: ${state.members[index]['CHAIR_NO']}',
+                                  fontSize: 12.sp),
+                              trailing: widget.index == 1
+                                  ? null
+                                  : IconButton(
+                                onPressed: () {
+                                  // Call the updateMemberStatus function in the controller
+                                  controller.updateMemberStatus(
+                                      memberId: state.members[index]['MEMBER_ID'],
+                                      index: widget.index);
+                                },
+                                icon:   Icon(Icons.delete,size: 24.h,),
+                                color: iconButtonColor,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),

@@ -184,15 +184,49 @@ class _BookSeatsState extends State<BookSeats> {
                       // _buildTextFormField(
                       //     _memberIdController, "Enter member id", keyboardType: TextInputType.number),
                       SizedBox(height: 10.h,),
-                      _buildTextFormField(_nameController, "Enter name", keyboardType: TextInputType.name),
-                      SizedBox(height: 10.h,),
-                      _buildTextFormField(_amountController, "Enter amount", keyboardType: TextInputType.number),
-                      SizedBox(height: 10.h,),
-                      _buildTextFormField(
-                          _dateOfJoiningController, "Date of Joining",
-                          enabled: false, keyboardType: TextInputType.none),
-                      SizedBox(height: 10.h,),
+                      MyTextForm(
+                        label: "Enter name",
+                        controller: _nameController,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(30),
+                        ],
+                        keyboardType: TextInputType.name,
+                        validator: true,
+                        validatorFunc: Utils.validateUserName(),
+                        //prefix: const Icon(Icons.email, color: Colors.white),
+                        onChanged: (String) {},
+                      ),
 
+                      SizedBox(height: 10.h,),
+                      MyTextForm(
+                        label: "Enter amount",
+                        controller: _amountController,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(30),
+                        ],
+                        keyboardType: TextInputType.number,
+                        validator: true,
+                        validatorLabel: "amount",
+                        //prefix: const Icon(Icons.email, color: Colors.white),
+                        onChanged: (String) {},
+                      ),
+
+                      SizedBox(height: 10.h,),
+                      MyTextForm(
+                        label: "Date of Joining",
+                        controller: _dateOfJoiningController,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(10),
+                          DateTextInputFormatter()
+                        ],
+                        readOnly: false,
+                        keyboardType: TextInputType.datetime,
+                        validator: true,
+                        validatorLabel: "date",
+                        //prefix: const Icon(Icons.email, color: Colors.white),
+                        onChanged: (String) {},
+                      ),
+                      SizedBox(height: 10.h,),
                       // Get Seat button
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -248,9 +282,9 @@ class _BookSeatsState extends State<BookSeats> {
                       // Filtered Chair Grid
                       // Showing only chairs for the selected shift
                       SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.7, // Limit grid height to 40% of the screen
+                        height: MediaQuery.of(context).size.height * 0.4, // Limit grid height to 40% of the screen
                         child: GridView.builder(
-                            physics: NeverScrollableScrollPhysics() ,
+                            physics: BouncingScrollPhysics() ,
                           padding: EdgeInsets.all(8.0),
                           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3,
@@ -366,30 +400,6 @@ class _BookSeatsState extends State<BookSeats> {
     );
   }
 
-// Builds the form fields for user input
-  Widget _buildTextFormField(
-      TextEditingController controller,
-      String label,
-      {required TextInputType keyboardType, bool enabled = true}) {
-
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child:  MyTextForm(
-        label: label,
-        controller: controller,
-        inputFormatters: [
-          LengthLimitingTextInputFormatter(30),
-        ],
-        keyboardType: keyboardType,
-        validator: true,
-        validatorFunc: Utils.emailValidator(),
-        //prefix: const Icon(Icons.email, color: Colors.white),
-        onChanged: (String) {},
-      ),
-    );
-  }
-
-
   // Builds the seat info display columns
   Widget _buildSeatInfoColumn(String title, String count) {
     return Column(
@@ -416,5 +426,50 @@ class _BookSeatsState extends State<BookSeats> {
       default:
         return "";
     }
+  }
+
+}
+
+
+
+class DateTextInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue,
+      TextEditingValue newValue,
+      ) {
+    String text = newValue.text.replaceAll('/', ''); // Remove existing slashes
+    StringBuffer formatted = StringBuffer();
+
+    // Format and add slashes after every 2 characters
+    for (int i = 0; i < text.length; i++) {
+      if (i > 0 && i % 2 == 0 && i < 6) {
+        formatted.write('/');
+      }
+      formatted.write(text[i]);
+    }
+
+    List<String> parts = formatted.toString().split('/');
+    if (parts.isNotEmpty) {
+      // Validate day (cannot exceed 30)
+      if (parts.length > 0 && int.tryParse(parts[0]) != null && int.parse(parts[0]) > 31) {
+        return oldValue;
+      }
+
+      // Validate month (cannot exceed 12)
+      if (parts.length > 1 && int.tryParse(parts[1]) != null && int.parse(parts[1]) > 12) {
+        return oldValue;
+      }
+
+      // Validate year (cannot exceed 2025)
+      if (parts.length > 2 && int.tryParse(parts[2]) != null && int.parse(parts[2]) > 2025) {
+        return oldValue;
+      }
+    }
+
+    return TextEditingValue(
+      text: formatted.toString(),
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
   }
 }

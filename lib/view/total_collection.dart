@@ -50,12 +50,12 @@ class _TotalCollectionState extends State<TotalCollection> {
                     MyText(
                       label: "Total Collection from Active Members: ₹$totalCollection",
                       fontSize: 20,
-                      fontColor: Colors.black,
+                      fontColor: Colors.white,
 
                     ),
                     const SizedBox(height: 20),
-                    MyText(label: "Active Members: $activeMembersCount", fontSize: 16, fontColor: Colors.black),
-                    MyText(label: "Inactive Members: $inactiveMembersCount", fontSize: 16, fontColor: Colors.black),
+                    MyText(label: "Active Members: $activeMembersCount", fontSize: 16,),
+                    MyText(label: "Inactive Members: $inactiveMembersCount", fontSize: 16),
                     const SizedBox(height: 20),
                     Expanded(
                       child: ListView.builder(

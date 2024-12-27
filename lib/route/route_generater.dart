@@ -52,7 +52,7 @@ class MyRoutes {
     /// Notification Screen
       case RoutePath.bookSeats:
         return MaterialPageRoute(
-          builder: (_) => BookSeats(totalSeats: '11',),
+          builder: (_) => BookSeats(totalSeats: '50',),
         );
     //
     /// AboutUs Screen

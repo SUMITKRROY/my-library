@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mylibrary/component/myText.dart';
 import '../component/my_container.dart';
 import '../database/table/seat_allotment_db.dart';
 import 'seat_allotment.dart';
@@ -28,11 +29,16 @@ class _ReminderPageState extends State<ReminderPage> {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 0,
-        title: Text("30-Day Membership Reminders",style: TextStyle(color: Colors.white),),
+        title: Text(
+          "30-Day Membership Reminders",
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: GradientContainer(
         child: eligibleMembers.isEmpty
-            ? Center(child: Text("No members have completed 30 days yet.",style: TextStyle(color: Colors.white)))
+            ? Center(
+                child: Text("No members have completed 30 days yet.",
+                    style: TextStyle(color: Colors.white)))
             : ListView.builder(
                 itemCount: eligibleMembers.length,
                 itemBuilder: (context, index) {
@@ -45,19 +51,29 @@ class _ReminderPageState extends State<ReminderPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "Member ID: ${member['MEMBER_ID']}",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 4),
-                          Text("Amount: ${member['Amount']}"),
-                          SizedBox(height: 4),
-                          Text(
-                              "Date of Joining: ${member[SeatAllotment.dateOfJoining]}"),
-                          SizedBox(height: 4),
-                          Text(
-                            "30 days complete!",
-                            style: TextStyle(color: Colors.red),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Name: ${member['Name']}",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text("Amount: ${member['Amount']}"),
+                                  SizedBox(height: 4),
+                                  Text("Date of Joining: ${member[SeatAllotment.dateOfJoining]}"),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    "30 days complete!",
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ],
+                              ),
+                              InkWell(child: MyText(label: "Pay amount",fontColor: Colors.green,),)
+                            ],
                           ),
                         ],
                       ),
