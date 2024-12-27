@@ -14,6 +14,7 @@ class MyTextForm extends StatefulWidget {
   final bool obscured;
   final bool validator;
   final dynamic prefix;
+  final dynamic suffix;
   final dynamic validatorFunc;
   final dynamic maxline;
   final bool readOnly;
@@ -28,6 +29,7 @@ class MyTextForm extends StatefulWidget {
     this.controller,
     this.obscured = false,
     this.prefix,
+    this.suffix,
     this.keyboardType,
     this.maxline,
     required this.validator,
@@ -84,6 +86,7 @@ class _CustomTextField extends State<MyTextForm> {
         contentPadding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 20.w),
 
         prefixIcon: widget.prefix,
+        suffixIcon: widget.suffix,
         labelText: widget.label,
         labelStyle: TextStyle(fontSize: widget.labelFontSize ?? 18.sp, color: Colors.white54),
         hintText: "Enter ${widget.label}",

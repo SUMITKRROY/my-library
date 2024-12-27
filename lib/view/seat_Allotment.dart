@@ -32,19 +32,19 @@ class _BookSeatsState extends State<BookSeats> {
   final TextEditingController _memberIdController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
-  final TextEditingController _dateOfJoiningController = TextEditingController();
+  final TextEditingController _dateOfJoiningController =
+      TextEditingController();
   int _selectedPeriodIndex = -1; // To keep track of the selected period index
   int _totalMembers = 0;
   int _totalSeats = 0;
   Map<String, List<String>> shiftData = {};
 
-
-
 // Function to generate and store UUID in the global variable
   void generateUuid() {
     var uuid = Uuid();
-    _memberIdController.text = uuid.v4();  // Store the generated UUID in the global variable
-        // Print the generated UUID
+    _memberIdController.text =
+        uuid.v4(); // Store the generated UUID in the global variable
+    // Print the generated UUID
   }
 
   @override
@@ -52,7 +52,8 @@ class _BookSeatsState extends State<BookSeats> {
     super.initState();
     _selectedChairIndex = -1; // No chair selected initially
     _selectedPeriodIndex = 0; // Automatically select the Morning shift
-    _dateOfJoiningController.text = Utils.getFormattedDate(DateTime.now()); // Set today's date
+    _dateOfJoiningController.text =
+        Utils.getFormattedDate(DateTime.now()); // Set today's date
     _fetchTotalMembers();
     generateUuid();
   }
@@ -69,14 +70,17 @@ class _BookSeatsState extends State<BookSeats> {
   Future<void> _fetchTotalMembers() async {
     try {
       List<Map<String, dynamic>> data = await SeatAllotment().getUserData();
-      List<Map<String, dynamic>> profileData = await ProfileTable().getProfile();
+      List<Map<String, dynamic>> profileData =
+          await ProfileTable().getProfile();
 
       // Call the filter function to get shift data
       shiftData = _filterDataByShift(data);
 
       setState(() {
         _totalMembers = data.length;
-        _totalSeats = profileData.isNotEmpty ? profileData.first['TOTAL_SEATS'] : 0; // Check if profileData is not empty
+        _totalSeats = profileData.isNotEmpty
+            ? profileData.first['TOTAL_SEATS']
+            : 0; // Check if profileData is not empty
         print("_totalSeats: $_totalSeats");
         print("_totalMembers: $_totalMembers");
         print("Filtered Shift Data: $shiftData"); // Print the filtered data
@@ -85,8 +89,10 @@ class _BookSeatsState extends State<BookSeats> {
       print("Error fetching total members: $e");
     }
   }
+
   // Function to filter the data by shift
-  Map<String, List<String>> _filterDataByShift(List<Map<String, dynamic>> data) {
+  Map<String, List<String>> _filterDataByShift(
+      List<Map<String, dynamic>> data) {
     // Initialize the shiftData map
     Map<String, List<String>> shiftData = {
       'Morning': [],
@@ -99,8 +105,10 @@ class _BookSeatsState extends State<BookSeats> {
 
     // Filter data by shift and populate the map
     for (var member in data) {
-      String shift = member['SHIFT'] ?? 'Unknown'; // Default to 'Unknown' if SHIFT is null
-      String chairNo = member['CHAIR_NO'] ?? 'N/A'; // Default to 'N/A' if CHAIR_NO is null
+      String shift =
+          member['SHIFT'] ?? 'Unknown'; // Default to 'Unknown' if SHIFT is null
+      String chairNo =
+          member['CHAIR_NO'] ?? 'N/A'; // Default to 'N/A' if CHAIR_NO is null
 
       // Check if the shift exists in the map and add the chair number
       if (shiftData.containsKey(shift)) {
@@ -113,6 +121,7 @@ class _BookSeatsState extends State<BookSeats> {
 
     return shiftData;
   }
+
   Future<void> _refreshData() async {
     await _fetchTotalMembers();
   }
@@ -183,7 +192,9 @@ class _BookSeatsState extends State<BookSeats> {
                       // Form fields
                       // _buildTextFormField(
                       //     _memberIdController, "Enter member id", keyboardType: TextInputType.number),
-                      SizedBox(height: 10.h,),
+                      SizedBox(
+                        height: 10.h,
+                      ),
                       MyTextForm(
                         label: "Enter name",
                         controller: _nameController,
@@ -197,7 +208,9 @@ class _BookSeatsState extends State<BookSeats> {
                         onChanged: (String) {},
                       ),
 
-                      SizedBox(height: 10.h,),
+                      SizedBox(
+                        height: 10.h,
+                      ),
                       MyTextForm(
                         label: "Enter amount",
                         controller: _amountController,
@@ -211,7 +224,9 @@ class _BookSeatsState extends State<BookSeats> {
                         onChanged: (String) {},
                       ),
 
-                      SizedBox(height: 10.h,),
+                      SizedBox(
+                        height: 10.h,
+                      ),
                       MyTextForm(
                         label: "Date of Joining",
                         controller: _dateOfJoiningController,
@@ -219,14 +234,32 @@ class _BookSeatsState extends State<BookSeats> {
                           LengthLimitingTextInputFormatter(10),
                           DateTextInputFormatter()
                         ],
-                        readOnly: false,
+                        readOnly: true,
                         keyboardType: TextInputType.datetime,
                         validator: true,
                         validatorLabel: "date",
-                        //prefix: const Icon(Icons.email, color: Colors.white),
-                        onChanged: (String) {},
+                        suffix: IconButton(
+                          onPressed: () async {
+                            DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000), // Set the minimum date
+                              lastDate: DateTime(2025), // Set the maximum date
+                            );
+                            if (pickedDate != null) {
+                              setState(() {
+                                _dateOfJoiningController.text = Utils.getFormattedDate(pickedDate);
+                              });
+                            }
+                          },
+                          icon: Icon(Icons.calendar_month, color: Colors.white),
+                        ),
+
+                          onChanged: (String) {},
                       ),
-                      SizedBox(height: 10.h,),
+                      SizedBox(
+                        height: 10.h,
+                      ),
                       // Get Seat button
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -248,33 +281,37 @@ class _BookSeatsState extends State<BookSeats> {
                                             'Please select a shift before proceeding.'),
                                       ),
                                     );
-                                  } else if (_formKey.currentState!.validate()) {
+                                  } else if (_formKey.currentState!
+                                      .validate()) {
                                     context.read<GetSeatBloc>().add(
-                                      InsertSeatEvent(
-                                        selectedShift: _getShiftLabel(
-                                            _selectedPeriodIndex),
-                                        memberId:
-                                        _memberIdController.text.trim(),
-                                        chairNo:
-                                        "S-${_selectedChairIndex + 1}",
-                                        memberStatus: 'Active',
-                                        name: _nameController.text.trim(),
-                                        amount: int.tryParse(_amountController.text.trim()) ?? 0, // Convert to int
-                                        dateOfJoining:
-                                        _dateOfJoiningController.text
-                                            .trim(),
-                                        selectedShiftIndex: _selectedPeriodIndex,
-                                        chairIndex: _selectedChairIndex,
-                                      ),
-                                    );
+                                          InsertSeatEvent(
+                                            selectedShift: _getShiftLabel(
+                                                _selectedPeriodIndex),
+                                            memberId:
+                                                _memberIdController.text.trim(),
+                                            chairNo:
+                                                "S-${_selectedChairIndex + 1}",
+                                            memberStatus: 'Active',
+                                            name: _nameController.text.trim(),
+                                            amount: int.tryParse(
+                                                    _amountController.text
+                                                        .trim()) ??
+                                                0, // Convert to int
+                                            dateOfJoining:
+                                                _dateOfJoiningController.text
+                                                    .trim(),
+                                            selectedShiftIndex:
+                                                _selectedPeriodIndex,
+                                            chairIndex: _selectedChairIndex,
+                                          ),
+                                        );
                                   }
                                 },
                                 text: "Get Seat",
                                 textColor: Colors.white,
                                 color: Color(0xffBC30AA).withOpacity(0.7),
                                 width: double.infinity,
-                                height: 50.h
-                            ),
+                                height: 50.h),
                           ),
                         ],
                       ),
@@ -282,20 +319,27 @@ class _BookSeatsState extends State<BookSeats> {
                       // Filtered Chair Grid
                       // Showing only chairs for the selected shift
                       SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.4, // Limit grid height to 40% of the screen
+                        height: MediaQuery.of(context).size.height *
+                            0.4, // Limit grid height to 40% of the screen
                         child: GridView.builder(
-                            physics: BouncingScrollPhysics() ,
+                          physics: BouncingScrollPhysics(),
                           padding: EdgeInsets.all(8.0),
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3,
                             childAspectRatio: 1,
                             crossAxisSpacing: 8.0,
                             mainAxisSpacing: 8.0,
                           ),
-                          itemCount: widget.totalSeats.isNotEmpty ? int.parse(widget.totalSeats) : 0,
+                          itemCount: widget.totalSeats.isNotEmpty
+                              ? int.parse(widget.totalSeats)
+                              : 0,
                           itemBuilder: (context, index) {
                             // Check if the chair is already allocated in the selected shift
-                            bool isChairAllocated = shiftData[_getShiftLabel(_selectedPeriodIndex)]?.contains("S-${index + 1}") ?? false;
+                            bool isChairAllocated =
+                                shiftData[_getShiftLabel(_selectedPeriodIndex)]
+                                        ?.contains("S-${index + 1}") ??
+                                    false;
 
                             return GestureDetector(
                               onTap: () {
@@ -303,12 +347,16 @@ class _BookSeatsState extends State<BookSeats> {
                                   // If chair is already allocated, show a message and don't allow selection
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text('Chair S-${index + 1} is already allotted in ${_getShiftLabel(_selectedPeriodIndex)} shift.'),
+                                      content: Text(
+                                          'Chair S-${index + 1} is already allotted in ${_getShiftLabel(_selectedPeriodIndex)} shift.'),
                                     ),
                                   );
                                 } else {
                                   setState(() {
-                                    _selectedChairIndex = _selectedChairIndex == index ? -1 : index;
+                                    _selectedChairIndex =
+                                        _selectedChairIndex == index
+                                            ? -1
+                                            : index;
                                   });
                                 }
                               },
@@ -320,17 +368,21 @@ class _BookSeatsState extends State<BookSeats> {
                                       child: Image.asset(
                                         ImagePath.chair,
                                         fit: BoxFit.cover,
-                                        color: isChairAllocated ? Colors.red.withOpacity(0.5) : null, // Red overlay for allocated chairs
+                                        color: isChairAllocated
+                                            ? Colors.red.withOpacity(0.5)
+                                            : null, // Red overlay for allocated chairs
                                       ),
                                     ),
                                     Positioned(
                                       bottom: 4,
                                       left: 2,
                                       child: Container(
-                                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 6, vertical: 2),
                                         decoration: BoxDecoration(
                                           color: Colors.green,
-                                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10)),
                                         ),
                                         child: MyText(
                                           label: 'S-${index + 1}',
@@ -365,7 +417,6 @@ class _BookSeatsState extends State<BookSeats> {
                           },
                         ),
                       ),
-
                     ],
                   ),
                 ),
@@ -427,17 +478,14 @@ class _BookSeatsState extends State<BookSeats> {
         return "";
     }
   }
-
 }
-
-
 
 class DateTextInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue,
-      TextEditingValue newValue,
-      ) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     String text = newValue.text.replaceAll('/', ''); // Remove existing slashes
     StringBuffer formatted = StringBuffer();
 
@@ -452,17 +500,23 @@ class DateTextInputFormatter extends TextInputFormatter {
     List<String> parts = formatted.toString().split('/');
     if (parts.isNotEmpty) {
       // Validate day (cannot exceed 30)
-      if (parts.length > 0 && int.tryParse(parts[0]) != null && int.parse(parts[0]) > 31) {
+      if (parts.length > 0 &&
+          int.tryParse(parts[0]) != null &&
+          int.parse(parts[0]) > 31) {
         return oldValue;
       }
 
       // Validate month (cannot exceed 12)
-      if (parts.length > 1 && int.tryParse(parts[1]) != null && int.parse(parts[1]) > 12) {
+      if (parts.length > 1 &&
+          int.tryParse(parts[1]) != null &&
+          int.parse(parts[1]) > 12) {
         return oldValue;
       }
 
       // Validate year (cannot exceed 2025)
-      if (parts.length > 2 && int.tryParse(parts[2]) != null && int.parse(parts[2]) > 2025) {
+      if (parts.length > 2 &&
+          int.tryParse(parts[2]) != null &&
+          int.parse(parts[2]) > 2025) {
         return oldValue;
       }
     }
