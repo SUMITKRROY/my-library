@@ -149,6 +149,38 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         SizedBox(height: 20.sp),
+                        // Add Guest User Button
+                        GestureDetector(
+                          onTap: () async {
+                            try {
+                              ProfileTable profileTable = ProfileTable();
+                              await profileTable.createGuestUser(context);
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Error creating guest user: $e')),
+                              );
+                            }
+                          },
+                          child: Container(
+                            height: 55,
+                            width: 300,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              color: Colors.grey[300],
+                            ),
+                            child: const Center(
+                              child: Text(
+                                'Continue as Guest',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20.sp),
                         InkWell(
                             child: const Padding(
                               padding: EdgeInsets.all(8.0),

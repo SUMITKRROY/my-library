@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../route/pageroute.dart';
 import '../database_helper.dart';
@@ -14,6 +15,7 @@ class ProfileTable {
   static const String userId = "UserId";
   static const String totalSeats = "TOTAL_SEATS";
   static const String loginStatus = "LoginStatus";
+  static const String isGuestUser = "IsGuestUser";
 
   static const String CREATE = '''
     CREATE TABLE IF NOT EXISTS $PROFILE_TABLE (
@@ -23,7 +25,8 @@ class ProfileTable {
       $totalSeats INTEGER DEFAULT 0,
       $email TEXT DEFAULT '',
       $password TEXT DEFAULT '',
-      $loginStatus TEXT DEFAULT ''
+      $loginStatus TEXT DEFAULT '',
+      $isGuestUser TEXT DEFAULT 'false'
     )
   ''';
 
@@ -101,4 +104,49 @@ class ProfileTable {
     );
   }
 
+  // Add method to create guest user
+  Future<void> createGuestUser(BuildContext context) async {
+    try {
+      final guestUserId = 'guest_${DateTime.now().millisecondsSinceEpoch}';
+      final guestProfile = {
+        userId: guestUserId,
+        name: 'Guest User',
+        phone: '',
+        totalSeats: 30,
+        email: '',
+        loginStatus: 'true',
+        isGuestUser: 'true'
+      };
+
+      // Insert into local database
+      await insert(guestProfile, context);
+
+      // Upload to Firebase
+      await _uploadToFirebase(guestProfile);
+
+    } catch (e) {
+      print("Error creating guest user: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error creating guest user: $e')),
+      );
+    }
+  }
+
+  // Method to upload profile to Firebase
+  Future<void> _uploadToFirebase(Map<String, dynamic> profile) async {
+    try {
+      final firestore = FirebaseFirestore.instance;
+      await firestore.collection('users').doc(profile[userId]).set({
+        'name': profile[name],
+        'phone': profile[phone],
+        'totalSeats': profile[totalSeats],
+        'email': profile[email],
+        'isGuestUser': profile[isGuestUser],
+        'lastUpdated': DateTime.now(),
+      });
+    } catch (e) {
+      print("Error uploading to Firebase: $e");
+      throw e;
+    }
+  }
 }
